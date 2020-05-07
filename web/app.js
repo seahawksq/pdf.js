@@ -194,6 +194,8 @@ const PDFViewerApplication = {
   async initialize(appConfig) {
     this.preferences = this.externalServices.createPreferences();
     this.appConfig = appConfig;
+    AppOptions.set('locale', this.appConfig.locale);
+    AppOptions.set('pdfFileName', this.appConfig.pdfFileName);
 
     await this._readPreferences();
     await this._parseHashParameters();
@@ -837,7 +839,7 @@ const PDFViewerApplication = {
     const url = this.baseUrl;
     // Use this.url instead of this.baseUrl to perform filename detection based
     // on the reference fragment as ultimate fallback if needed.
-    const filename =
+    const filename = this.appConfig.pdfFileName ||
       this.contentDispositionFilename || getPDFFileNameFromURL(this.url);
     const downloadManager = this.downloadManager;
     downloadManager.onerror = err => {
@@ -1688,7 +1690,6 @@ const PDFViewerApplication = {
     eventBus._on("updatefindcontrolstate", webViewerUpdateFindControlState);
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       eventBus._on("fileinputchange", webViewerFileInputChange);
-      eventBus._on("openfile", webViewerOpenFile);
     }
   },
 
@@ -1762,7 +1763,6 @@ const PDFViewerApplication = {
     eventBus._off("updatefindcontrolstate", webViewerUpdateFindControlState);
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       eventBus._off("fileinputchange", webViewerFileInputChange);
-      eventBus._off("openfile", webViewerOpenFile);
     }
 
     _boundEvents.beforePrint = null;
@@ -1855,12 +1855,12 @@ function webViewerInitialized() {
   if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
     const queryString = document.location.search.substring(1);
     const params = parseQueryString(queryString);
-    file = "file" in params ? params.file : AppOptions.get("defaultUrl");
+    file = "file" in params ? params.file : '';
     validateFileURL(file);
   } else if (PDFJSDev.test("MOZCENTRAL")) {
     file = window.location.href.split("#")[0];
   } else if (PDFJSDev.test("CHROME")) {
-    file = AppOptions.get("defaultUrl");
+    file = '';
   }
 
   if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
@@ -1870,18 +1870,6 @@ function webViewerInitialized() {
     fileInput.setAttribute("type", "file");
     fileInput.oncontextmenu = noContextMenuHandler;
     document.body.appendChild(fileInput);
-
-    if (
-      !window.File ||
-      !window.FileReader ||
-      !window.FileList ||
-      !window.Blob
-    ) {
-      appConfig.toolbar.openFile.setAttribute("hidden", "true");
-      appConfig.secondaryToolbar.openFileButton.setAttribute("hidden", "true");
-    } else {
-      fileInput.value = null;
-    }
 
     fileInput.addEventListener("change", function (evt) {
       const files = evt.target.files;
@@ -1912,9 +1900,6 @@ function webViewerInitialized() {
         fileInput: evt.dataTransfer,
       });
     });
-  } else {
-    appConfig.toolbar.openFile.setAttribute("hidden", "true");
-    appConfig.secondaryToolbar.openFileButton.setAttribute("hidden", "true");
   }
 
   if (

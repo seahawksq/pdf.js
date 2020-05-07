@@ -73,7 +73,6 @@ function getViewerConfiguration() {
       zoomIn: document.getElementById("zoomIn"),
       zoomOut: document.getElementById("zoomOut"),
       viewFind: document.getElementById("viewFind"),
-      openFile: document.getElementById("openFile"),
       print: document.getElementById("print"),
       presentationModeButton: document.getElementById("presentationMode"),
       download: document.getElementById("download"),
@@ -88,7 +87,6 @@ function getViewerConfiguration() {
       presentationModeButton: document.getElementById(
         "secondaryPresentationMode"
       ),
-      openFileButton: document.getElementById("secondaryOpenFile"),
       printButton: document.getElementById("secondaryPrint"),
       downloadButton: document.getElementById("secondaryDownload"),
       viewBookmarkButton: document.getElementById("secondaryViewBookmark"),
@@ -182,6 +180,8 @@ function getViewerConfiguration() {
     printContainer: document.getElementById("printContainer"),
     openFileInputName: "fileInput",
     debuggerScriptPath: "./debugger.js",
+    locale: getParameterFromQueryString('lng'),
+    pdfFileName: getParameterFromQueryString('name'),
   };
 }
 
@@ -229,6 +229,16 @@ function webViewerLoad() {
 
     pdfjsWebApp.PDFViewerApplication.run(config);
   }
+}
+
+function getParameterFromQueryString(parameterName) {
+  var results = new RegExp('[\?&]' + parameterName + '=([^&#]*)').exec(window.location.href);
+    if (results == null) {
+       return null;
+    }
+    else {
+       return decodeURI(results[1]) || 0;
+    }
 }
 
 if (

@@ -941,6 +941,30 @@ html[dir="rtl"] .secondaryToolbarButton > span {
   content: url(images/secondaryToolbarButton-lastPage.png);
 }
 
+.secondaryToolbarButton.exportExcel::before {
+  content: url(images/toolbarButton-download.png);
+}
+
+.secondaryToolbarButton.exportWord::before {
+  content: url(images/toolbarButton-download.png);
+}
+
+.secondaryToolbarButton.exportCsv::before {
+  content: url(images/toolbarButton-download.png);
+}
+
+.secondaryToolbarButton.exportXml::before {
+  content: url(images/toolbarButton-download.png);
+}
+
+.secondaryToolbarButton.exportHTML::before {
+  content: url(images/toolbarButton-download.png);
+}
+
+.secondaryToolbarButton.exportTIFF::before {
+  content: url(images/toolbarButton-download.png);
+}
+
 .secondaryToolbarButton.rotateCcw::before {
   content: url(images/secondaryToolbarButton-rotateCcw.png);
 }
@@ -1689,6 +1713,30 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
 
   .secondaryToolbarButton.lastPage::before {
     content: url(images/secondaryToolbarButton-lastPage@2x.png);
+  }
+
+  .secondaryToolbarButton.exportExcel::before {
+    content: url(images/toolbarButton-download@2x.png);
+  }
+
+  .secondaryToolbarButton.exportWord::before {
+    content: url(images/toolbarButton-download@2x.png);
+  }
+
+  .secondaryToolbarButton.exportCsv::before {
+    content: url(images/toolbarButton-download@2x.png);
+  }
+
+  .secondaryToolbarButton.exportXml::before {
+    content: url(images/toolbarButton-download@2x.png);
+  }
+
+  .secondaryToolbarButton.exportHTML::before {
+    content: url(images/toolbarButton-download@2x.png);
+  }
+
+  .secondaryToolbarButton.exportTIFF::before {
+    content: url(images/toolbarButton-download@2x.png);
   }
 
   .secondaryToolbarButton.rotateCcw::before {

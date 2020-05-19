@@ -92,6 +92,12 @@ function getViewerConfiguration() {
       viewBookmarkButton: document.getElementById("secondaryViewBookmark"),
       firstPageButton: document.getElementById("firstPage"),
       lastPageButton: document.getElementById("lastPage"),
+      exportExcelButton: document.getElementById("exportExcel"),
+      exportWordButton: document.getElementById("exportWord"),
+      exportCsvButton: document.getElementById("exportCsv"),
+      exportXmlButton: document.getElementById("exportXml"),
+      exportHTMLButton: document.getElementById("exportHTML"),
+      exportTIFFButton: document.getElementById("exportTIFF"),
       pageRotateCwButton: document.getElementById("pageRotateCw"),
       pageRotateCcwButton: document.getElementById("pageRotateCcw"),
       cursorSelectToolButton: document.getElementById("cursorSelectTool"),
@@ -182,6 +188,7 @@ function getViewerConfiguration() {
     debuggerScriptPath: "./debugger.js",
     locale: getParameterFromQueryString('lng'),
     pdfFileName: getParameterFromQueryString('name'),
+    runId: getParameterFromQueryString('id'),
   };
 }
 

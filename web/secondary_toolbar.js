@@ -36,6 +36,18 @@ import { PDFSinglePageViewer } from "./pdf_single_page_viewer.js";
  *   page in the document.
  * @property {HTMLButtonElement} lastPageButton - Button to go to the last page
  *   in the document.
+ * @property {HTMLButtonElement} exportExcelButton - Button to export report to
+ *   Excel document.
+ * @property {HTMLButtonElement} exportWordButton - Button to export report to
+ *   Word document.
+ * @property {HTMLButtonElement} exportCsvButton - Button to export report to
+ *   CSV document.
+ * @property {HTMLButtonElement} exportXmlButton - Button to export report to
+ *   XML document.
+ * @property {HTMLButtonElement} exportHTMLButton - Button to export report to
+ *   HTML document.
+ * @property {HTMLButtonElement} exportTIFFButton - Button to export report to
+ *   TIFF document.
  * @property {HTMLButtonElement} pageRotateCwButton - Button to rotate the pages
  *   clockwise.
  * @property {HTMLButtonElement} pageRotateCcwButton - Button to rotate the
@@ -69,6 +81,36 @@ class SecondaryToolbar {
       { element: options.viewBookmarkButton, eventName: null, close: true },
       { element: options.firstPageButton, eventName: "firstpage", close: true },
       { element: options.lastPageButton, eventName: "lastpage", close: true },
+      { 
+        element: options.exportExcelButton,
+        eventName: "exportExcel",
+        close: true
+      },
+      { 
+        element: options.exportWordButton,
+        eventName: "exportWord",
+        close: true
+      },
+      { 
+        element: options.exportCsvButton,
+        eventName: "exportCsv",
+        close: true
+      },
+      { 
+        element: options.exportXmlButton,
+        eventName: "exportXml",
+        close: true
+      },
+      { 
+        element: options.exportHTMLButton,
+        eventName: "exportHTML",
+        close: true
+      },
+      { 
+        element: options.exportTIFFButton,
+        eventName: "exportTIFF",
+        close: true
+      },
       {
         element: options.pageRotateCwButton,
         eventName: "rotatecw",
@@ -138,6 +180,12 @@ class SecondaryToolbar {
       lastPage: options.lastPageButton,
       pageRotateCw: options.pageRotateCwButton,
       pageRotateCcw: options.pageRotateCcwButton,
+      exportExcel: options.exportExcelButton,
+      exportWord: options.exportWordButton,
+      exportCsv: options.exportCsvButton,
+      exportXml: options.exportXmlButton,
+      exportHTML: options.exportHTMLButton,
+      exportTIFF: options.exportTIFFButton,
     };
 
     this.mainContainer = mainContainer;
@@ -207,6 +255,12 @@ class SecondaryToolbar {
     this.items.lastPage.disabled = this.pageNumber >= this.pagesCount;
     this.items.pageRotateCw.disabled = this.pagesCount === 0;
     this.items.pageRotateCcw.disabled = this.pagesCount === 0;
+    this.items.exportExcel.disabled = this.pagesCount === 0;
+    this.items.exportWord.disabled = this.pagesCount === 0;
+    this.items.exportCsv.disabled = this.pagesCount === 0;
+    this.items.exportXml.disabled = this.pagesCount === 0;
+    this.items.exportHTML.disabled = this.pagesCount === 0;
+    this.items.exportTIFF.disabled = this.pagesCount === 0;
   }
 
   _bindClickListeners() {

@@ -196,6 +196,7 @@ const PDFViewerApplication = {
     this.appConfig = appConfig;
     AppOptions.set('locale', this.appConfig.locale);
     AppOptions.set('pdfFileName', this.appConfig.pdfFileName);
+    AppOptions.set('runId', this.appConfig.runId);
 
     await this._readPreferences();
     await this._parseHashParameters();
@@ -1677,6 +1678,12 @@ const PDFViewerApplication = {
     eventBus._on("zoomreset", webViewerZoomReset);
     eventBus._on("pagenumberchanged", webViewerPageNumberChanged);
     eventBus._on("scalechanged", webViewerScaleChanged);
+    eventBus._on("exportExcel", webViewerExportExcel);
+    eventBus._on("exportWord", webViewerExportWord);
+    eventBus._on("exportCsv", webViewerExportCsv);
+    eventBus._on("exportXml", webViewerExportXml);
+    eventBus._on("exportHTML", webViewerExportHTML);
+    eventBus._on("exportTIFF", webViewerExportTIFF);
     eventBus._on("rotatecw", webViewerRotateCw);
     eventBus._on("rotateccw", webViewerRotateCcw);
     eventBus._on("switchscrollmode", webViewerSwitchScrollMode);
@@ -1750,6 +1757,12 @@ const PDFViewerApplication = {
     eventBus._off("zoomreset", webViewerZoomReset);
     eventBus._off("pagenumberchanged", webViewerPageNumberChanged);
     eventBus._off("scalechanged", webViewerScaleChanged);
+    eventBus._off("exportExcel", webViewerExportExcel);
+    eventBus._off("exportWord", webViewerExportWord);
+    eventBus._off("exportCsv", webViewerExportCsv);
+    eventBus._off("exportXml", webViewerExportXml);
+    eventBus._off("exportHTML", webViewerExportHTML);
+    eventBus._off("exportTIFF", webViewerExportTIFF);
     eventBus._off("rotatecw", webViewerRotateCw);
     eventBus._off("rotateccw", webViewerRotateCcw);
     eventBus._off("switchscrollmode", webViewerSwitchScrollMode);
@@ -2311,6 +2324,42 @@ function webViewerSwitchSpreadMode(evt) {
 }
 function webViewerDocumentProperties() {
   PDFViewerApplication.pdfDocumentProperties.open();
+}
+
+function webViewerExportExcel() {
+  var origin = window.location.protocol + '//' + window.location.host;
+  var exportMsg = JSON.stringify({ RunId: PDFViewerApplication.appConfig.runId, Message: "excel" });
+  parent.postMessage("export:" + exportMsg, origin);
+}
+
+function webViewerExportWord() {
+  var origin = window.location.protocol + '//' + window.location.host;
+  var exportMsg = JSON.stringify({ RunId: PDFViewerApplication.appConfig.runId, Message: "word" });
+  parent.postMessage("export:" + exportMsg, origin);
+}
+
+function webViewerExportCsv() {
+  var origin = window.location.protocol + '//' + window.location.host;
+  var exportMsg = JSON.stringify({ RunId: PDFViewerApplication.appConfig.runId, Message: "csv" });
+  parent.postMessage("export:" + exportMsg, origin);
+}
+
+function webViewerExportXml() {
+  var origin = window.location.protocol + '//' + window.location.host;
+  var exportMsg = JSON.stringify({ RunId: PDFViewerApplication.appConfig.runId, Message: "xml" });
+  parent.postMessage("export:" + exportMsg, origin);
+}
+
+function webViewerExportHTML() {
+  var origin = window.location.protocol + '//' + window.location.host;
+  var exportMsg = JSON.stringify({ RunId: PDFViewerApplication.appConfig.runId, Message: "html" });
+  parent.postMessage("export:" + exportMsg, origin);
+}
+
+function webViewerExportTIFF() {
+  var origin = window.location.protocol + '//' + window.location.host;
+  var exportMsg = JSON.stringify({ RunId: PDFViewerApplication.appConfig.runId, Message: "tiff" });
+  parent.postMessage("export:" + exportMsg, origin);
 }
 
 function webViewerFind(evt) {

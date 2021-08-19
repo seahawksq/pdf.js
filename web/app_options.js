@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-import { apiCompatibilityParams } from "pdfjs-lib";
 import { viewerCompatibilityParams } from "./viewer_compatibility.js";
 
 const OptionKind = {
@@ -53,9 +52,6 @@ const defaultOptions = {
     value: false,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
-  /**
-   * The `disablePreferences` is, conditionally, defined below.
-   */
   enablePermissions: {
     /** @type {boolean} */
     value: false,
@@ -63,12 +59,12 @@ const defaultOptions = {
   },
   enablePrintAutoRotate: {
     /** @type {boolean} */
-    value: false,
+    value: true,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
-  enableWebGL: {
+  enableScripting: {
     /** @type {boolean} */
-    value: false,
+    value: true,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   externalLinkRel: {
@@ -96,9 +92,6 @@ const defaultOptions = {
     value: "./images/",
     kind: OptionKind.VIEWER,
   },
-  /**
-   * The `locale` is, conditionally, defined below.
-   */
   maxCanvasPixels: {
     /** @type {number} */
     value: 16777216,
@@ -107,7 +100,7 @@ const defaultOptions = {
   },
   pdfBugEnabled: {
     /** @type {boolean} */
-    value: false,
+    value: typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION"),
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   printResolution: {
@@ -118,11 +111,11 @@ const defaultOptions = {
   renderer: {
     /** @type {string} */
     value: "canvas",
-    kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
+    kind: OptionKind.VIEWER,
   },
   renderInteractiveForms: {
     /** @type {boolean} */
-    value: false,
+    value: true,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   sidebarViewOnLoad: {
@@ -150,6 +143,11 @@ const defaultOptions = {
     value: false,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
+  viewerCssTheme: {
+    /** @type {number} */
+    value: 0,
+    kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
+  },
   viewOnLoad: {
     /** @type {boolean} */
     value: 0,
@@ -174,12 +172,6 @@ const defaultOptions = {
     value: false,
     kind: OptionKind.API + OptionKind.PREFERENCE,
   },
-  disableCreateObjectURL: {
-    /** @type {boolean} */
-    value: false,
-    compatibility: apiCompatibilityParams.disableCreateObjectURL,
-    kind: OptionKind.API,
-  },
   disableFontFace: {
     /** @type {boolean} */
     value: false,
@@ -199,6 +191,11 @@ const defaultOptions = {
     /** @type {string} */
     value: "",
     kind: OptionKind.API,
+  },
+  enableXfa: {
+    /** @type {boolean} */
+    value: false,
+    kind: OptionKind.API + OptionKind.PREFERENCE,
   },
   fontExtraProperties: {
     /** @type {boolean} */
@@ -242,16 +239,37 @@ const defaultOptions = {
 };
 if (
   typeof PDFJSDev === "undefined" ||
-  PDFJSDev.test("!PRODUCTION || (GENERIC && !LIB)")
+  PDFJSDev.test("!PRODUCTION || GENERIC")
 ) {
   defaultOptions.disablePreferences = {
     /** @type {boolean} */
-    value: false,
+    value: typeof PDFJSDev !== "undefined" && PDFJSDev.test("TESTING"),
     kind: OptionKind.VIEWER,
   };
   defaultOptions.locale = {
     /** @type {string} */
     value: typeof navigator !== "undefined" ? navigator.language : "en-US",
+    kind: OptionKind.VIEWER,
+  };
+  defaultOptions.sandboxBundleSrc = {
+    /** @type {string} */
+    value:
+      typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION")
+        ? "../build/dev-sandbox/pdf.sandbox.js"
+        : "../build/pdf.sandbox.js",
+    kind: OptionKind.VIEWER,
+  };
+
+  defaultOptions.renderer.kind += OptionKind.PREFERENCE;
+} else if (PDFJSDev.test("CHROME")) {
+  defaultOptions.disableTelemetry = {
+    /** @type {boolean} */
+    value: false,
+    kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
+  };
+  defaultOptions.sandboxBundleSrc = {
+    /** @type {string} */
+    value: "../build/pdf.sandbox.js",
     kind: OptionKind.VIEWER,
   };
 }
@@ -270,7 +288,7 @@ class AppOptions {
     }
     const defaultOption = defaultOptions[name];
     if (defaultOption !== undefined) {
-      return defaultOption.compatibility || defaultOption.value;
+      return defaultOption.compatibility ?? defaultOption.value;
     }
     return undefined;
   }
@@ -302,13 +320,19 @@ class AppOptions {
       options[name] =
         userOption !== undefined
           ? userOption
-          : defaultOption.compatibility || defaultOption.value;
+          : defaultOption.compatibility ?? defaultOption.value;
     }
     return options;
   }
 
   static set(name, value) {
     userOptions[name] = value;
+  }
+
+  static setAll(options) {
+    for (const name in options) {
+      userOptions[name] = options[name];
+    }
   }
 
   static remove(name) {

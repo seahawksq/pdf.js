@@ -161,12 +161,11 @@ class TextLayerBuilder {
     if (!matches) {
       return [];
     }
-    const { findController, textContentItemsStr } = this;
+    const { textContentItemsStr } = this;
 
     let i = 0,
       iIndex = 0;
     const end = textContentItemsStr.length - 1;
-    const queryLen = findController.state.query.length;
     const result = [];
 
     for (let m = 0, mm = matches.length; m < mm; m++) {
@@ -191,13 +190,7 @@ class TextLayerBuilder {
       };
 
       // Calculate the end position.
-      if (matchesLength) {
-        // Multiterm search.
-        matchIdx += matchesLength[m];
-      } else {
-        // Phrase search.
-        matchIdx += queryLen;
-      }
+      matchIdx += matchesLength[m];
 
       // Somewhat the same array as above, but use > instead of >= to get
       // the end position right.
@@ -324,13 +317,8 @@ class TextLayerBuilder {
     if (!this.renderingDone) {
       return;
     }
-    const {
-      findController,
-      matches,
-      pageIdx,
-      textContentItemsStr,
-      textDivs,
-    } = this;
+    const { findController, matches, pageIdx, textContentItemsStr, textDivs } =
+      this;
     let clearedUntilDivIdx = -1;
 
     // Clear all current matches.
@@ -345,7 +333,7 @@ class TextLayerBuilder {
       clearedUntilDivIdx = match.end.divIdx + 1;
     }
 
-    if (!findController || !findController.highlightMatches) {
+    if (!findController?.highlightMatches) {
       return;
     }
     // Convert the matches on the `findController` into the match format
@@ -463,4 +451,4 @@ class DefaultTextLayerFactory {
   }
 }
 
-export { TextLayerBuilder, DefaultTextLayerFactory };
+export { DefaultTextLayerFactory, TextLayerBuilder };

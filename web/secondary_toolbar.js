@@ -360,6 +360,7 @@ class SecondaryToolbar {
     this._setMaxHeight();
 
     this.toggleButton.classList.add("toggled");
+    this.toggleButton.setAttribute("aria-expanded", "true");
     this.toolbar.classList.remove("hidden");
   }
 
@@ -370,6 +371,7 @@ class SecondaryToolbar {
     this.opened = false;
     this.toolbar.classList.add("hidden");
     this.toggleButton.classList.remove("toggled");
+    this.toggleButton.setAttribute("aria-expanded", "false");
   }
 
   toggle() {

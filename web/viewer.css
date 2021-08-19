@@ -1173,30 +1173,6 @@ html[dir="rtl"] .secondaryToolbarButton > span {
   mask-image: var(--secondaryToolbarButton-lastPage-icon);
 }
 
-.secondaryToolbarButton.exportExcel::before {
-  content: url(images/toolbarButton-download.png);
-}
-
-.secondaryToolbarButton.exportWord::before {
-  content: url(images/toolbarButton-download.png);
-}
-
-.secondaryToolbarButton.exportCsv::before {
-  content: url(images/toolbarButton-download.png);
-}
-
-.secondaryToolbarButton.exportXml::before {
-  content: url(images/toolbarButton-download.png);
-}
-
-.secondaryToolbarButton.exportHTML::before {
-  content: url(images/toolbarButton-download.png);
-}
-
-.secondaryToolbarButton.exportTIFF::before {
-  content: url(images/toolbarButton-download.png);
-}
-
 .secondaryToolbarButton.rotateCcw::before {
   -webkit-mask-image: var(--secondaryToolbarButton-rotateCcw-icon);
   mask-image: var(--secondaryToolbarButton-rotateCcw-icon);
@@ -1921,30 +1897,6 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
 
   .secondaryToolbarButton.lastPage::before {
     content: url(images/secondaryToolbarButton-lastPage@2x.png);
-  }
-
-  .secondaryToolbarButton.exportExcel::before {
-    content: url(images/toolbarButton-download@2x.png);
-  }
-
-  .secondaryToolbarButton.exportWord::before {
-    content: url(images/toolbarButton-download@2x.png);
-  }
-
-  .secondaryToolbarButton.exportCsv::before {
-    content: url(images/toolbarButton-download@2x.png);
-  }
-
-  .secondaryToolbarButton.exportXml::before {
-    content: url(images/toolbarButton-download@2x.png);
-  }
-
-  .secondaryToolbarButton.exportHTML::before {
-    content: url(images/toolbarButton-download@2x.png);
-  }
-
-  .secondaryToolbarButton.exportTIFF::before {
-    content: url(images/toolbarButton-download@2x.png);
   }
 
   .secondaryToolbarButton.rotateCcw::before {

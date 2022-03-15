@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-import { NullL10n } from "./ui_utils.js";
 import { PasswordResponses } from "pdfjs-lib";
 
 /**
@@ -37,12 +36,7 @@ class PasswordPrompt {
    * @param {boolean} [isViewerEmbedded] - If the viewer is embedded, in e.g.
    *   an <iframe> or an <object>. The default value is `false`.
    */
-  constructor(
-    options,
-    overlayManager,
-    l10n = NullL10n,
-    isViewerEmbedded = false
-  ) {
+  constructor(options, overlayManager, l10n, isViewerEmbedded = false) {
     this.overlayName = options.overlayName;
     this.container = options.container;
     this.label = options.label;
@@ -57,64 +51,52 @@ class PasswordPrompt {
     this.reason = null;
 
     // Attach the event listeners.
-    this.submitButton.addEventListener("click", this.verify.bind(this));
-    this.cancelButton.addEventListener("click", this.close.bind(this));
+    this.submitButton.addEventListener("click", this.#verify.bind(this));
+    this.cancelButton.addEventListener("click", this.#cancel.bind(this));
     this.input.addEventListener("keydown", e => {
       if (e.keyCode === /* Enter = */ 13) {
-        this.verify();
+        this.#verify();
       }
     });
 
     this.overlayManager.register(
       this.overlayName,
       this.container,
-      this.close.bind(this),
+      this.#cancel.bind(this),
       true
     );
   }
 
-  open() {
-    this.overlayManager.open(this.overlayName).then(() => {
-      if (
-        !this._isViewerEmbedded ||
-        this.reason === PasswordResponses.INCORRECT_PASSWORD
-      ) {
-        this.input.focus();
-      }
+  async open() {
+    await this.overlayManager.open(this.overlayName);
 
-      let promptString;
-      if (this.reason === PasswordResponses.INCORRECT_PASSWORD) {
-        promptString = this.l10n.get(
-          "password_invalid",
-          null,
-          "Invalid password. Please try again."
-        );
-      } else {
-        promptString = this.l10n.get(
-          "password_label",
-          null,
-          "Enter the password to open this PDF file."
-        );
-      }
+    const passwordIncorrect =
+      this.reason === PasswordResponses.INCORRECT_PASSWORD;
 
-      promptString.then(msg => {
-        this.label.textContent = msg;
-      });
-    });
+    if (!this._isViewerEmbedded || passwordIncorrect) {
+      this.input.focus();
+    }
+    this.label.textContent = await this.l10n.get(
+      `password_${passwordIncorrect ? "invalid" : "label"}`
+    );
   }
 
-  close() {
-    this.overlayManager.close(this.overlayName).then(() => {
-      this.input.value = "";
-    });
+  async close() {
+    await this.overlayManager.close(this.overlayName);
+    this.input.value = "";
   }
 
-  verify() {
+  #verify() {
     const password = this.input.value;
     if (password?.length > 0) {
       this.close();
       this.updateCallback(password);
     }
+  }
+
+  #cancel() {
+    this.close();
+    this.updateCallback(new Error("PasswordPrompt cancelled."));
   }
 
   setUpdateCallback(updateCallback, reason) {

@@ -19,6 +19,8 @@
   --sidebar-width: 200px;
   --sidebar-transition-duration: 200ms;
   --sidebar-transition-timing-function: ease;
+  --scale-select-container-width: 140px;
+  --scale-select-overflow: 22px;
   --loadingBar-end-offset: 0;
 
   --toolbar-icon-opacity: 0.7;
@@ -26,18 +28,21 @@
 
   --main-color: rgba(12, 12, 13, 1);
   --body-bg-color: rgba(237, 237, 240, 1);
-  --errorWrapper-bg-color: rgba(255, 74, 74, 1);
+  --errorWrapper-bg-color: rgba(255, 110, 110, 1);
   --progressBar-color: rgba(10, 132, 255, 1);
   --progressBar-indeterminate-bg-color: rgba(221, 221, 222, 1);
   --progressBar-indeterminate-blend-color: rgba(116, 177, 239, 1);
   --scrollbar-color: auto;
   --scrollbar-bg-color: auto;
   --toolbar-icon-bg-color: rgba(0, 0, 0, 1);
+  --toolbar-icon-hover-bg-color: rgba(0, 0, 0, 1);
 
-  --sidebar-bg-color: rgba(245, 246, 247, 1);
+  --sidebar-narrow-bg-color: rgba(237, 237, 240, 0.9);
+  --sidebar-toolbar-bg-color: rgba(245, 246, 247, 1);
   --toolbar-bg-color: rgba(249, 249, 250, 1);
   --toolbar-border-color: rgba(204, 204, 204, 1);
   --button-hover-color: rgba(221, 222, 223, 1);
+  --toggled-btn-color: rgba(0, 0, 0, 1);
   --toggled-btn-bg-color: rgba(0, 0, 0, 0.3);
   --toggled-hover-active-btn-color: rgba(0, 0, 0, 0.4);
   --dropdown-btn-bg-color: rgba(215, 215, 219, 1);
@@ -53,10 +58,12 @@
   --sidebaritem-bg-color: rgba(0, 0, 0, 0.15);
   --doorhanger-bg-color: rgba(255, 255, 255, 1);
   --doorhanger-border-color: rgba(12, 12, 13, 0.2);
-  --doorhanger-hover-color: rgba(237, 237, 237, 1);
+  --doorhanger-hover-color: rgba(12, 12, 13, 1);
+  --doorhanger-hover-bg-color: rgba(237, 237, 237, 1);
   --doorhanger-separator-color: rgba(222, 222, 222, 1);
+  --overlay-button-border: 0 none;
   --overlay-button-bg-color: rgba(12, 12, 13, 0.1);
-  --overlay-button-hover-color: rgba(12, 12, 13, 0.3);
+  --overlay-button-hover-bg-color: rgba(12, 12, 13, 0.3);
 
   --loading-icon: url(images/loading.svg);
   --treeitem-expanded-icon: url(images/treeitem-expanded.svg);
@@ -87,6 +94,7 @@
   --secondaryToolbarButton-rotateCw-icon: url(images/secondaryToolbarButton-rotateCw.svg);
   --secondaryToolbarButton-selectTool-icon: url(images/secondaryToolbarButton-selectTool.svg);
   --secondaryToolbarButton-handTool-icon: url(images/secondaryToolbarButton-handTool.svg);
+  --secondaryToolbarButton-scrollPage-icon: url(images/secondaryToolbarButton-scrollPage.svg);
   --secondaryToolbarButton-scrollVertical-icon: url(images/secondaryToolbarButton-scrollVertical.svg);
   --secondaryToolbarButton-scrollHorizontal-icon: url(images/secondaryToolbarButton-scrollHorizontal.svg);
   --secondaryToolbarButton-scrollWrapped-icon: url(images/secondaryToolbarButton-scrollWrapped.svg);
@@ -100,18 +108,21 @@
   :root {
     --main-color: rgba(249, 249, 250, 1);
     --body-bg-color: rgba(42, 42, 46, 1);
-    --errorWrapper-bg-color: rgba(199, 17, 17, 1);
+    --errorWrapper-bg-color: rgba(169, 14, 14, 1);
     --progressBar-color: rgba(0, 96, 223, 1);
     --progressBar-indeterminate-bg-color: rgba(40, 40, 43, 1);
     --progressBar-indeterminate-blend-color: rgba(20, 68, 133, 1);
     --scrollbar-color: rgba(121, 121, 123, 1);
     --scrollbar-bg-color: rgba(35, 35, 39, 1);
     --toolbar-icon-bg-color: rgba(255, 255, 255, 1);
+    --toolbar-icon-hover-bg-color: rgba(255, 255, 255, 1);
 
-    --sidebar-bg-color: rgba(50, 50, 52, 1);
+    --sidebar-narrow-bg-color: rgba(42, 42, 46, 0.9);
+    --sidebar-toolbar-bg-color: rgba(50, 50, 52, 1);
     --toolbar-bg-color: rgba(56, 56, 61, 1);
     --toolbar-border-color: rgba(12, 12, 13, 1);
     --button-hover-color: rgba(102, 102, 103, 1);
+    --toggled-btn-color: rgba(255, 255, 255, 1);
     --toggled-btn-bg-color: rgba(0, 0, 0, 0.3);
     --toggled-hover-active-btn-color: rgba(0, 0, 0, 0.4);
     --dropdown-btn-bg-color: rgba(74, 74, 79, 1);
@@ -127,15 +138,35 @@
     --sidebaritem-bg-color: rgba(255, 255, 255, 0.15);
     --doorhanger-bg-color: rgba(74, 74, 79, 1);
     --doorhanger-border-color: rgba(39, 39, 43, 1);
-    --doorhanger-hover-color: rgba(93, 94, 98, 1);
+    --doorhanger-hover-color: rgba(249, 249, 250, 1);
+    --doorhanger-hover-bg-color: rgba(93, 94, 98, 1);
     --doorhanger-separator-color: rgba(92, 92, 97, 1);
     --overlay-button-bg-color: rgba(92, 92, 97, 1);
-    --overlay-button-hover-color: rgba(115, 115, 115, 1);
+    --overlay-button-hover-bg-color: rgba(115, 115, 115, 1);
 
     /* This image is used in <input> elements, which unfortunately means that
      * the `mask-image` approach used with all of the other images doesn't work
      * here; hence why we still have two versions of this particular image. */
     --loading-icon: url(images/loading-dark.svg);
+  }
+}
+
+@media screen and (forced-colors: active) {
+  :root {
+    --button-hover-color: Highlight;
+    --doorhanger-hover-bg-color: Highlight;
+    --toolbar-icon-opacity: 1;
+    --toolbar-icon-bg-color: ButtonText;
+    --toolbar-icon-hover-bg-color: ButtonFace;
+    --toggled-btn-color: HighlightText;
+    --toggled-btn-bg-color: LinkText;
+    --doorhanger-hover-color: ButtonFace;
+    --doorhanger-border-color-whcm: 1px solid ButtonText;
+    --doorhanger-triangle-opacity-whcm: 0;
+    --overlay-button-border: 1px solid Highlight;
+    --overlay-button-hover-bg-color: Highlight;
+    --overlay-button-hover-color: ButtonFace;
+    --field-border-color: ButtonText;
   }
 }
 
@@ -147,8 +178,6 @@
 html {
   height: 100%;
   width: 100%;
-  /* Font size is needed to make the activity bar the correct size. */
-  font-size: 10px;
 }
 
 body {
@@ -173,14 +202,8 @@ select {
   display: none !important;
 }
 
-.pdfViewer.enablePermissions .textLayer > span {
-  user-select: none !important;
-  cursor: not-allowed;
-}
-
 #viewerContainer.pdfPresentationMode:fullscreen {
   top: 0;
-  border-top: 2px solid rgba(0, 0, 0, 0);
   background-color: rgba(0, 0, 0, 1);
   width: 100%;
   height: 100%;
@@ -193,12 +216,12 @@ select {
   display: none;
 }
 
-.pdfPresentationMode:fullscreen .textLayer > span {
+.pdfPresentationMode:fullscreen .textLayer span {
   cursor: none;
 }
 
 .pdfPresentationMode.pdfPresentationModeControls > *,
-.pdfPresentationMode.pdfPresentationModeControls .textLayer > span {
+.pdfPresentationMode.pdfPresentationModeControls .textLayer span {
   cursor: default;
 }
 
@@ -222,10 +245,12 @@ select {
 html[dir="ltr"] #sidebarContainer {
   transition-property: left;
   left: calc(0px - var(--sidebar-width));
+  border-right: var(--doorhanger-border-color-whcm);
 }
 html[dir="rtl"] #sidebarContainer {
   transition-property: right;
   right: calc(0px - var(--sidebar-width));
+  border-left: var(--doorhanger-border-color-whcm);
 }
 
 #outerContainer.sidebarResizing #sidebarContainer {
@@ -259,7 +284,6 @@ html[dir="rtl"] #outerContainer.sidebarOpen #sidebarContainer {
   top: 32px;
   bottom: 0;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
   position: absolute;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.1);
@@ -275,7 +299,6 @@ html[dir="rtl"] #sidebarContent {
 
 #viewerContainer {
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
   position: absolute;
   top: 32px;
   right: 0;
@@ -321,7 +344,7 @@ html[dir="rtl"]
 #toolbarSidebar {
   width: 100%;
   height: 32px;
-  background-color: var(--sidebar-bg-color);
+  background-color: var(--sidebar-toolbar-bg-color);
 }
 html[dir="ltr"] #toolbarSidebar {
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25), 0 1px 0 rgba(0, 0, 0, 0.15),
@@ -475,7 +498,7 @@ html[dir="rtl"] #outerContainer.sidebarOpen #loadingBar {
 .findbar.wrapContainers > div {
   clear: both;
 }
-.findbar.wrapContainers > div#findbarMessageContainer {
+.findbar.wrapContainers > div.findbarMessageContainer {
   height: auto;
 }
 html[dir="ltr"] .findbar {
@@ -532,7 +555,8 @@ html[dir="rtl"] .findbar .splitToolbarButton > .findNext {
 }
 
 .findbar label:hover,
-.findbar input:focus + label {
+.findbar input:focus-visible + label {
+  color: var(--toggled-btn-color);
   background-color: var(--button-hover-color);
 }
 
@@ -547,6 +571,7 @@ html[dir="rtl"] #findInput {
 
 .findbar .toolbarField[type="checkbox"]:checked + .toolbarLabel {
   background-color: var(--toggled-btn-bg-color) !important;
+  color: var(--toggled-btn-color);
 }
 
 #findInput {
@@ -587,13 +612,7 @@ html[dir="rtl"] .secondaryToolbar {
   max-width: 220px;
   max-height: 400px;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   margin-bottom: -4px;
-}
-
-#secondaryToolbarButtonContainer.hiddenScrollModeButtons > .scrollModeButtons,
-#secondaryToolbarButtonContainer.hiddenSpreadModeButtons > .spreadModeButtons {
-  display: none !important;
 }
 
 .doorHanger,
@@ -601,6 +620,7 @@ html[dir="rtl"] .secondaryToolbar {
   border-radius: 2px;
   box-shadow: 0 1px 5px var(--doorhanger-border-color),
     0 0 0 1px var(--doorhanger-border-color);
+  border: var(--doorhanger-border-color-whcm);
 }
 .doorHanger:after,
 .doorHanger:before,
@@ -613,6 +633,7 @@ html[dir="rtl"] .secondaryToolbar {
   width: 0;
   position: absolute;
   pointer-events: none;
+  opacity: var(--doorhanger-triangle-opacity-whcm);
 }
 .doorHanger:after,
 .doorHangerRight:after {
@@ -658,13 +679,15 @@ html[dir="ltr"] .doorHangerRight:before {
   background-color: rgba(217, 217, 217, 1);
   color: rgba(82, 82, 82, 1);
   text-align: center;
-  padding: 3px 4px;
+  padding: 4px 5px;
   margin: 5px;
 }
 
 #findMsg {
   color: rgba(251, 0, 0, 1);
 }
+
+#findResultsCount:empty,
 #findMsg:empty {
   display: none;
 }
@@ -725,13 +748,15 @@ html[dir="rtl"] .splitToolbarButton > .toolbarButton {
   width: 28px;
   height: 28px;
 }
-.overlayButton {
-  background-color: var(--overlay-button-bg-color);
-}
 
 .overlayButton:hover,
-.overlayButton:focus {
-  background-color: var(--overlay-button-hover-color);
+.overlayButton:focus-visible {
+  background-color: var(--overlay-button-hover-bg-color);
+}
+
+.overlayButton:hover > span,
+.overlayButton:focus-visible > span {
+  color: var(--overlay-button-hover-color);
 }
 
 .toolbarButton > span {
@@ -752,10 +777,10 @@ html[dir="rtl"] .splitToolbarButton > .toolbarButton {
 }
 
 .splitToolbarButton > .toolbarButton:hover,
-.splitToolbarButton > .toolbarButton:focus,
+.splitToolbarButton > .toolbarButton:focus-visible,
 .dropdownToolbarButton:hover,
 .toolbarButton.textButton:hover,
-.toolbarButton.textButton:focus {
+.toolbarButton.textButton:focus-visible {
   background-color: var(--button-hover-color);
   z-index: 199;
 }
@@ -819,18 +844,28 @@ html[dir="rtl"] #toolbarViewerLeft > .toolbarButton:first-child {
   margin-right: 2px;
 }
 .toolbarButton:hover,
-.toolbarButton:focus {
+.toolbarButton:focus-visible {
   background-color: var(--button-hover-color);
 }
 .secondaryToolbarButton:hover,
-.secondaryToolbarButton:focus {
-  background-color: var(--doorhanger-hover-color);
+.secondaryToolbarButton:focus-visible {
+  background-color: var(--doorhanger-hover-bg-color);
+  color: var(--doorhanger-hover-color);
 }
 
 .toolbarButton.toggled,
 .splitToolbarButton.toggled > .toolbarButton.toggled,
 .secondaryToolbarButton.toggled {
   background-color: var(--toggled-btn-bg-color);
+  color: var(--toggled-btn-color);
+}
+
+.secondaryToolbarButton.toggled::before {
+  background-color: var(--toggled-btn-color);
+}
+
+.toolbarButton.toggled::before {
+  background-color: var(--toggled-btn-color);
 }
 
 .toolbarButton.toggled:hover:active,
@@ -840,7 +875,7 @@ html[dir="rtl"] #toolbarViewerLeft > .toolbarButton:first-child {
 }
 
 .dropdownToolbarButton {
-  width: 140px;
+  width: var(--scale-select-container-width);
   padding: 0;
   overflow: hidden;
   background-color: var(--dropdown-btn-bg-color);
@@ -861,31 +896,26 @@ html[dir="rtl"] .dropdownToolbarButton::after {
 }
 
 .dropdownToolbarButton > select {
-  width: 162px;
+  width: calc(
+    var(--scale-select-container-width) + var(--scale-select-overflow)
+  );
   height: 28px;
   font-size: 12px;
   color: var(--main-color);
   margin: 0;
   padding: 1px 0 2px;
+  padding-inline-start: 4px;
   border: none;
   background-color: var(--dropdown-btn-bg-color);
 }
-html[dir="ltr"] .dropdownToolbarButton > select {
-  padding-left: 4px;
-}
-html[dir="rtl"] .dropdownToolbarButton > select {
-  padding-right: 4px;
-}
-.dropdownToolbarButton > select:hover {
+.dropdownToolbarButton > select:hover,
+.dropdownToolbarButton > select:focus-visible {
   background-color: var(--button-hover-color);
+  color: var(--toggled-btn-color);
 }
-
-.dropdownToolbarButton > select:focus {
-  background-color: var(--button-hover-color);
-}
-
 .dropdownToolbarButton > select > option {
   background: var(--doorhanger-bg-color);
+  color: var(--main-color);
 }
 
 #customScaleOption {
@@ -919,10 +949,23 @@ html[dir="rtl"] .dropdownToolbarButton > select {
   mask-size: cover;
 }
 
+.dropdownToolbarButton:hover::after,
+.dropdownToolbarButton:focus-visible::after,
+.dropdownToolbarButton:active::after {
+  background-color: var(--toolbar-icon-hover-bg-color);
+}
+
 .toolbarButton::before {
   opacity: var(--toolbar-icon-opacity);
   top: 6px;
   left: 6px;
+}
+
+.toolbarButton:hover::before,
+.toolbarButton:focus-visible::before,
+.secondaryToolbarButton:hover::before,
+.secondaryToolbarButton:focus-visible::before {
+  background-color: var(--toolbar-icon-hover-bg-color);
 }
 
 .secondaryToolbarButton::before {
@@ -1080,28 +1123,18 @@ html[dir="rtl"] .toolbarButton.pdfSidebarNotification::after {
   position: relative;
   margin: 0;
   padding: 0 0 1px;
+  padding-inline-start: 36px;
   height: auto;
   min-height: 26px;
   width: auto;
   min-width: 100%;
+  text-align: start;
   white-space: normal;
   border-radius: 0;
   box-sizing: border-box;
 }
-html[dir="ltr"] .secondaryToolbarButton {
-  padding-left: 36px;
-  text-align: left;
-}
-html[dir="rtl"] .secondaryToolbarButton {
-  padding-right: 36px;
-  text-align: right;
-}
-
-html[dir="ltr"] .secondaryToolbarButton > span {
-  padding-right: 4px;
-}
-html[dir="rtl"] .secondaryToolbarButton > span {
-  padding-left: 4px;
+.secondaryToolbarButton > span {
+  padding-inline-end: 4px;
 }
 
 .secondaryToolbarButton.firstPage::before {
@@ -1132,6 +1165,11 @@ html[dir="rtl"] .secondaryToolbarButton > span {
 .secondaryToolbarButton.handTool::before {
   -webkit-mask-image: var(--secondaryToolbarButton-handTool-icon);
   mask-image: var(--secondaryToolbarButton-handTool-icon);
+}
+
+.secondaryToolbarButton.scrollPage::before {
+  -webkit-mask-image: var(--secondaryToolbarButton-scrollPage-icon);
+  mask-image: var(--secondaryToolbarButton-scrollPage-icon);
 }
 
 .secondaryToolbarButton.scrollVertical::before {
@@ -1234,10 +1272,8 @@ html[dir="rtl"] .toolbarField[type="checkbox"] {
   background-position: 3px;
 }
 
-.toolbarField.pageNumber::-webkit-inner-spin-button,
-.toolbarField.pageNumber::-webkit-outer-spin-button {
+.toolbarField.pageNumber::-webkit-inner-spin-button {
   -webkit-appearance: none;
-  margin: 0;
 }
 
 .toolbarField:focus {
@@ -1246,9 +1282,8 @@ html[dir="rtl"] .toolbarField[type="checkbox"] {
 
 .toolbarLabel {
   min-width: 16px;
-  padding: 6px;
+  padding: 7px;
   margin: 2px;
-  border: 1px solid rgba(0, 0, 0, 0);
   border-radius: 2px;
   color: var(--main-color);
   font-size: 12px;
@@ -1258,11 +1293,8 @@ html[dir="rtl"] .toolbarField[type="checkbox"] {
   cursor: default;
 }
 
-html[dir="ltr"] #numPages.toolbarLabel {
-  padding-left: 2px;
-}
-html[dir="rtl"] #numPages.toolbarLabel {
-  padding-right: 2px;
+#numPages.toolbarLabel {
+  padding-inline-start: 3px;
 }
 
 #thumbnailView {
@@ -1272,7 +1304,6 @@ html[dir="rtl"] #numPages.toolbarLabel {
   bottom: 0;
   padding: 10px 30px 0;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 #thumbnailView > a:active,
@@ -1348,7 +1379,6 @@ a:focus > .thumbnail > .thumbnailSelectionRing,
   bottom: 0;
   padding: 4px 4px 0;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
   user-select: none;
 }
 
@@ -1370,6 +1400,8 @@ html[dir="rtl"] .treeItem > .treeItems {
   min-width: calc(100% - 4px);
   height: auto;
   margin-bottom: 1px;
+  padding: 2px 0 5px;
+  padding-inline-start: 4px;
   border-radius: 2px;
   color: var(--treeitem-color);
   font-size: 13px;
@@ -1378,21 +1410,12 @@ html[dir="rtl"] .treeItem > .treeItems {
   white-space: normal;
   cursor: pointer;
 }
-html[dir="ltr"] .treeItem > a {
-  padding: 2px 0 5px 4px;
-}
-html[dir="rtl"] .treeItem > a {
-  padding: 2px 4px 5px 0;
-}
 
 #layersView .treeItem > a > * {
   cursor: pointer;
 }
-html[dir="ltr"] #layersView .treeItem > a > label {
-  padding-left: 4px;
-}
-html[dir="rtl"] #layersView .treesItem > a > label {
-  padding-right: 4px;
+#layersView .treeItem > a > label {
+  padding-inline-start: 4px;
 }
 
 .treeItemToggler {
@@ -1481,6 +1504,9 @@ html[dir="rtl"] .treeItemToggler::before {
   width: auto;
   margin: 3px 4px 2px !important;
   padding: 2px 11px;
+  color: var(--main-color);
+  background-color: var(--overlay-button-bg-color);
+  border: var(--overlay-button-border) !important;
 }
 
 #overlayContainer {
@@ -1490,10 +1516,6 @@ html[dir="rtl"] .treeItemToggler::before {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 40000;
-}
-#overlayContainer > * {
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 #overlayContainer > .container {
@@ -1556,12 +1578,7 @@ html[dir="rtl"] .treeItemToggler::before {
 }
 #documentPropertiesOverlay .row > * {
   min-width: 100px;
-}
-html[dir="ltr"] #documentPropertiesOverlay .row > * {
-  text-align: left;
-}
-html[dir="rtl"] #documentPropertiesOverlay .row > * {
-  text-align: right;
+  text-align: start;
 }
 #documentPropertiesOverlay .row > span {
   width: 125px;
@@ -1609,7 +1626,6 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
   bottom: 0;
   left: 0;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
   position: absolute;
   right: 0;
   top: 27px;
@@ -1637,6 +1653,20 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
 }
 #PDFBug table {
   font-size: 10px;
+  white-space: pre;
+}
+#PDFBug table.showText {
+  border-collapse: collapse;
+  text-align: center;
+}
+#PDFBug table.showText,
+#PDFBug table.showText tr,
+#PDFBug table.showText td {
+  border: 1px solid black;
+  padding: 1px;
+}
+#PDFBug table.showText td.advance {
+  color: grey;
 }
 
 #viewer.textLayer-visible .textLayer {
@@ -1651,19 +1681,19 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
   mix-blend-mode: screen;
 }
 
-#viewer.textLayer-visible .textLayer > span {
+#viewer.textLayer-visible .textLayer span {
   background-color: rgba(255, 255, 0, 0.1);
   color: rgba(0, 0, 0, 1);
   border: solid 1px rgba(255, 0, 0, 0.5);
   box-sizing: border-box;
 }
 
-#viewer.textLayer-hover .textLayer > span:hover {
+#viewer.textLayer-hover .textLayer span:hover {
   background-color: rgba(255, 255, 255, 1);
   color: rgba(0, 0, 0, 1);
 }
 
-#viewer.textLayer-shadow .textLayer > span {
+#viewer.textLayer-shadow .textLayer span {
   background-color: rgba(255, 255, 255, 0.6);
   color: rgba(0, 0, 0, 1);
 }
@@ -1711,7 +1741,8 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
   .toolbar,
   #loadingBox,
   #errorWrapper,
-  .textLayer {
+  .textLayer,
+  .canvasWrapper {
     display: none;
   }
   #viewerContainer {
@@ -1755,18 +1786,38 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
     height: 100%;
   }
   /* wrapper around (scaled) print canvas elements */
-  #printContainer > div {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 1px;
-    height: 1px;
-    overflow: visible;
+  #printContainer > .printedPage {
     page-break-after: always;
     page-break-inside: avoid;
+
+    /* The wrapper always cover the whole page. */
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
-  #printContainer canvas,
-  #printContainer img {
+
+  #printContainer > .xfaPrintedPage .xfaPage {
+    position: absolute;
+  }
+
+  #printContainer > .xfaPrintedPage {
+    page-break-after: always;
+    page-break-inside: avoid;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  #printContainer > .printedPage canvas,
+  #printContainer > .printedPage img {
+    /* The intrinsic canvas / image size will make sure that we fit the page. */
+    max-width: 100%;
+    max-height: 100%;
+
     direction: ltr;
     display: block;
   }
@@ -1789,8 +1840,8 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
 }
 
 @media all and (max-width: 840px) {
-  #sidebarContent {
-    background-color: rgba(0, 0, 0, 0.7);
+  #sidebarContainer {
+    background-color: var(--sidebar-narrow-bg-color);
   }
 
   html[dir="ltr"] #outerContainer.sidebarOpen #viewerContainer {

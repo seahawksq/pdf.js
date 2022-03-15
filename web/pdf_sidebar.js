@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
-import { NullL10n, PresentationModeState, SidebarView } from "./ui_utils.js";
-import { RenderingStates } from "./pdf_rendering_queue.js";
+import {
+  PresentationModeState,
+  RenderingStates,
+  SidebarView,
+} from "./ui_utils.js";
 
 const UI_NOTIFICATION_CLASS = "pdfSidebarNotification";
 
@@ -61,13 +64,7 @@ class PDFSidebar {
   /**
    * @param {PDFSidebarOptions} options
    */
-  constructor({
-    elements,
-    pdfViewer,
-    pdfThumbnailViewer,
-    eventBus,
-    l10n = NullL10n,
-  }) {
+  constructor({ elements, pdfViewer, pdfThumbnailViewer, eventBus, l10n }) {
     this.isOpen = false;
     this.active = SidebarView.THUMBS;
     this.isInitialViewSet = false;
@@ -215,34 +212,29 @@ class PDFSidebar {
     // in order to prevent setting it to an invalid state.
     this.active = view;
 
-    // Update the CSS classes, for all buttons...
-    this.thumbnailButton.classList.toggle(
-      "toggled",
-      view === SidebarView.THUMBS
-    );
-    this.outlineButton.classList.toggle(
-      "toggled",
-      view === SidebarView.OUTLINE
-    );
-    this.attachmentsButton.classList.toggle(
-      "toggled",
-      view === SidebarView.ATTACHMENTS
-    );
-    this.layersButton.classList.toggle("toggled", view === SidebarView.LAYERS);
+    const isThumbs = view === SidebarView.THUMBS,
+      isOutline = view === SidebarView.OUTLINE,
+      isAttachments = view === SidebarView.ATTACHMENTS,
+      isLayers = view === SidebarView.LAYERS;
+
+    // Update the CSS classes (and aria attributes), for all buttons...
+    this.thumbnailButton.classList.toggle("toggled", isThumbs);
+    this.outlineButton.classList.toggle("toggled", isOutline);
+    this.attachmentsButton.classList.toggle("toggled", isAttachments);
+    this.layersButton.classList.toggle("toggled", isLayers);
+
+    this.thumbnailButton.setAttribute("aria-checked", `${isThumbs}`);
+    this.outlineButton.setAttribute("aria-checked", `${isOutline}`);
+    this.attachmentsButton.setAttribute("aria-checked", `${isAttachments}`);
+    this.layersButton.setAttribute("aria-checked", `${isLayers}`);
     // ... and for all views.
-    this.thumbnailView.classList.toggle("hidden", view !== SidebarView.THUMBS);
-    this.outlineView.classList.toggle("hidden", view !== SidebarView.OUTLINE);
-    this.attachmentsView.classList.toggle(
-      "hidden",
-      view !== SidebarView.ATTACHMENTS
-    );
-    this.layersView.classList.toggle("hidden", view !== SidebarView.LAYERS);
+    this.thumbnailView.classList.toggle("hidden", !isThumbs);
+    this.outlineView.classList.toggle("hidden", !isOutline);
+    this.attachmentsView.classList.toggle("hidden", !isAttachments);
+    this.layersView.classList.toggle("hidden", !isLayers);
 
     // Finally, update view-specific CSS classes.
-    this._outlineOptionsContainer.classList.toggle(
-      "hidden",
-      view !== SidebarView.OUTLINE
-    );
+    this._outlineOptionsContainer.classList.toggle("hidden", !isOutline);
 
     if (forceOpen && !this.isOpen) {
       this.open();
@@ -345,15 +337,9 @@ class PDFSidebar {
    * @private
    */
   _showUINotification() {
-    this.l10n
-      .get(
-        "toggle_sidebar_notification2.title",
-        null,
-        "Toggle Sidebar (document contains outline/attachments/layers)"
-      )
-      .then(msg => {
-        this.toggleButton.title = msg;
-      });
+    this.l10n.get("toggle_sidebar_notification2.title").then(msg => {
+      this.toggleButton.title = msg;
+    });
 
     if (!this.isOpen) {
       // Only show the notification on the `toggleButton` if the sidebar is
@@ -373,11 +359,9 @@ class PDFSidebar {
     }
 
     if (reset) {
-      this.l10n
-        .get("toggle_sidebar.title", null, "Toggle Sidebar")
-        .then(msg => {
-          this.toggleButton.title = msg;
-        });
+      this.l10n.get("toggle_sidebar.title").then(msg => {
+        this.toggleButton.title = msg;
+      });
     }
   }
 
@@ -439,11 +423,12 @@ class PDFSidebar {
     this.eventBus._on("outlineloaded", evt => {
       onTreeLoaded(evt.outlineCount, this.outlineButton, SidebarView.OUTLINE);
 
-      if (evt.enableCurrentOutlineItemButton) {
-        this.pdfViewer.pagesPromise.then(() => {
-          this._currentOutlineItemButton.disabled = !this.isInitialViewSet;
-        });
-      }
+      evt.currentOutlineItemPromise.then(enabled => {
+        if (!this.isInitialViewSet) {
+          return;
+        }
+        this._currentOutlineItemButton.disabled = !enabled;
+      });
     });
 
     this.eventBus._on("attachmentsloaded", evt => {

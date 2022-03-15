@@ -87,11 +87,7 @@ class PDFLayerViewer extends BaseTreeViewer {
       element.textContent = this._normalizeTextContent(name);
       return;
     }
-    element.textContent = await this.l10n.get(
-      "additional_layers",
-      null,
-      "Additional Layers"
-    );
+    element.textContent = await this.l10n.get("additional_layers");
     element.style.fontStyle = "italic";
   }
 
@@ -185,7 +181,8 @@ class PDFLayerViewer extends BaseTreeViewer {
       return;
     }
     // Fetch the default optional content configuration...
-    const optionalContentConfig = await this._pdfDocument.getOptionalContentConfig();
+    const optionalContentConfig =
+      await this._pdfDocument.getOptionalContentConfig();
 
     this.eventBus.dispatch("optionalcontentconfig", {
       source: this,

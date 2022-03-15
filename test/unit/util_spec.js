@@ -17,16 +17,10 @@ import {
   bytesToString,
   createPromiseCapability,
   createValidAbsoluteUrl,
-  encodeToXmlString,
   escapeString,
   getModificationDate,
   isArrayBuffer,
   isAscii,
-  isBool,
-  isNum,
-  isSameOrigin,
-  isString,
-  removeNullCharacters,
   string32,
   stringToBytes,
   stringToPDFString,
@@ -77,53 +71,6 @@ describe("util", function () {
     });
   });
 
-  describe("isBool", function () {
-    it("handles boolean values", function () {
-      expect(isBool(true)).toEqual(true);
-      expect(isBool(false)).toEqual(true);
-    });
-
-    it("handles non-boolean values", function () {
-      expect(isBool("true")).toEqual(false);
-      expect(isBool("false")).toEqual(false);
-      expect(isBool(1)).toEqual(false);
-      expect(isBool(0)).toEqual(false);
-      expect(isBool(null)).toEqual(false);
-      expect(isBool(undefined)).toEqual(false);
-    });
-  });
-
-  describe("isNum", function () {
-    it("handles numeric values", function () {
-      expect(isNum(1)).toEqual(true);
-      expect(isNum(0)).toEqual(true);
-      expect(isNum(-1)).toEqual(true);
-      expect(isNum(1000000000000000000)).toEqual(true);
-      expect(isNum(12.34)).toEqual(true);
-    });
-
-    it("handles non-numeric values", function () {
-      expect(isNum("true")).toEqual(false);
-      expect(isNum(true)).toEqual(false);
-      expect(isNum(null)).toEqual(false);
-      expect(isNum(undefined)).toEqual(false);
-    });
-  });
-
-  describe("isString", function () {
-    it("handles string values", function () {
-      expect(isString("foo")).toEqual(true);
-      expect(isString("")).toEqual(true);
-    });
-
-    it("handles non-string values", function () {
-      expect(isString(true)).toEqual(false);
-      expect(isString(1)).toEqual(false);
-      expect(isString(null)).toEqual(false);
-      expect(isString(undefined)).toEqual(false);
-    });
-  });
-
   describe("string32", function () {
     it("converts unsigned 32-bit integers to strings", function () {
       expect(string32(0x74727565)).toEqual("true");
@@ -161,6 +108,19 @@ describe("util", function () {
       expect(stringToPDFString(str)).toEqual("string");
     });
 
+    it("handles UTF-8 strings", function () {
+      const simpleStr = "\xEF\xBB\xBF\x73\x74\x72\x69\x6E\x67";
+      expect(stringToPDFString(simpleStr)).toEqual("string");
+
+      const complexStr =
+        "\xEF\xBB\xBF\xE8\xA1\xA8\xE3\x83\x9D\xE3\x81\x82\x41\xE9\xB7\x97" +
+        "\xC5\x92\xC3\xA9\xEF\xBC\xA2\xE9\x80\x8D\xC3\x9C\xC3\x9F\xC2\xAA" +
+        "\xC4\x85\xC3\xB1\xE4\xB8\x82\xE3\x90\x80\xF0\xA0\x80\x80";
+      expect(stringToPDFString(complexStr)).toEqual(
+        "表ポあA鷗ŒéＢ逍Üßªąñ丂㐀𠀀"
+      );
+    });
+
     it("handles empty strings", function () {
       // ISO Latin 1
       const str1 = "";
@@ -173,18 +133,10 @@ describe("util", function () {
       // UTF-16LE
       const str3 = "\xFF\xFE";
       expect(stringToPDFString(str3)).toEqual("");
-    });
-  });
 
-  describe("removeNullCharacters", function () {
-    it("should not modify string without null characters", function () {
-      const str = "string without null chars";
-      expect(removeNullCharacters(str)).toEqual("string without null chars");
-    });
-
-    it("should modify string with null characters", function () {
-      const str = "string\x00With\x00Null\x00Chars";
-      expect(removeNullCharacters(str)).toEqual("stringWithNullChars");
+      // UTF-8
+      const str4 = "\xEF\xBB\xBF";
+      expect(stringToPDFString(str4)).toEqual("");
     });
   });
 
@@ -209,31 +161,6 @@ describe("util", function () {
     it("should have property `href`", function () {
       const url = new URL("https://example.com");
       expect(typeof url.href).toEqual("string");
-    });
-  });
-
-  describe("isSameOrigin", function () {
-    it("handles invalid base URLs", function () {
-      // The base URL is not valid.
-      expect(isSameOrigin("/foo", "/bar")).toEqual(false);
-
-      // The base URL has no origin.
-      expect(isSameOrigin("blob:foo", "/bar")).toEqual(false);
-    });
-
-    it("correctly checks if the origin of both URLs matches", function () {
-      expect(
-        isSameOrigin(
-          "https://www.mozilla.org/foo",
-          "https://www.mozilla.org/bar"
-        )
-      ).toEqual(true);
-      expect(
-        isSameOrigin(
-          "https://www.mozilla.org/foo",
-          "https://www.example.com/bar"
-        )
-      ).toEqual(false);
     });
   });
 
@@ -290,33 +217,33 @@ describe("util", function () {
   });
 
   describe("createPromiseCapability", function () {
-    it("should resolve with correct data", function (done) {
+    it("should resolve with correct data", async function () {
       const promiseCapability = createPromiseCapability();
       expect(promiseCapability.settled).toEqual(false);
 
       promiseCapability.resolve({ test: "abc" });
 
-      promiseCapability.promise.then(function (data) {
-        expect(promiseCapability.settled).toEqual(true);
-
-        expect(data).toEqual({ test: "abc" });
-        done();
-      }, done.fail);
+      const data = await promiseCapability.promise;
+      expect(promiseCapability.settled).toEqual(true);
+      expect(data).toEqual({ test: "abc" });
     });
 
-    it("should reject with correct reason", function (done) {
+    it("should reject with correct reason", async function () {
       const promiseCapability = createPromiseCapability();
       expect(promiseCapability.settled).toEqual(false);
 
       promiseCapability.reject(new Error("reason"));
 
-      promiseCapability.promise.then(done.fail, function (reason) {
-        expect(promiseCapability.settled).toEqual(true);
+      try {
+        await promiseCapability.promise;
 
+        // Shouldn't get here.
+        expect(false).toEqual(true);
+      } catch (reason) {
+        expect(promiseCapability.settled).toEqual(true);
         expect(reason instanceof Error).toEqual(true);
         expect(reason.message).toEqual("reason");
-        done();
-      });
+      }
     });
   });
 
@@ -332,20 +259,6 @@ describe("util", function () {
     it("should get a correctly formatted date", function () {
       const date = new Date(Date.UTC(3141, 5, 9, 2, 6, 53));
       expect(getModificationDate(date)).toEqual("31410609020653");
-    });
-  });
-
-  describe("encodeToXmlString", function () {
-    it("should get a correctly encoded string with some entities", function () {
-      const str = "\"\u0397ell😂' & <W😂rld>";
-      expect(encodeToXmlString(str)).toEqual(
-        "&quot;&#x397;ell&#x1F602;&apos; &amp; &lt;W&#x1F602;rld&gt;"
-      );
-    });
-
-    it("should get a correctly encoded basic ascii string", function () {
-      const str = "hello world";
-      expect(encodeToXmlString(str)).toEqual(str);
     });
   });
 

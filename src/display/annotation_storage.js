@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { objectFromEntries } from "../shared/util.js";
+import { objectFromMap } from "../shared/util.js";
 
 /**
  * Key/value storage for annotation data in forms.
@@ -21,19 +21,19 @@ import { objectFromEntries } from "../shared/util.js";
 class AnnotationStorage {
   constructor() {
     this._storage = new Map();
+    this._timeStamp = Date.now();
     this._modified = false;
 
     // Callbacks to signal when the modification state is set or reset.
     // This is used by the viewer to only bind on `beforeunload` if forms
     // are actually edited to prevent doing so unconditionally since that
-    // can have undesirable efffects.
+    // can have undesirable effects.
     this.onSetModified = null;
     this.onResetModified = null;
   }
 
   /**
-   * Get the value for a given key if it exists
-   * or store and return the default value
+   * Get the value for a given key if it exists, or return the default value.
    *
    * @public
    * @memberof AnnotationStorage
@@ -41,13 +41,13 @@ class AnnotationStorage {
    * @param {Object} defaultValue
    * @returns {Object}
    */
-  getOrCreateValue(key, defaultValue) {
-    if (this._storage.has(key)) {
-      return this._storage.get(key);
+  getValue(key, defaultValue) {
+    const value = this._storage.get(key);
+    if (value === undefined) {
+      return defaultValue;
     }
 
-    this._storage.set(key, defaultValue);
-    return defaultValue;
+    return Object.assign(defaultValue, value);
   }
 
   /**
@@ -69,19 +69,17 @@ class AnnotationStorage {
         }
       }
     } else {
-      this._storage.set(key, value);
       modified = true;
+      this._storage.set(key, value);
     }
     if (modified) {
+      this._timeStamp = Date.now();
       this._setModified();
     }
   }
 
   getAll() {
-    if (this._storage.size === 0) {
-      return null;
-    }
-    return objectFromEntries(this._storage);
+    return this._storage.size > 0 ? objectFromMap(this._storage) : null;
   }
 
   get size() {
@@ -107,6 +105,22 @@ class AnnotationStorage {
         this.onResetModified();
       }
     }
+  }
+
+  /**
+   * PLEASE NOTE: Only intended for usage within the API itself.
+   * @ignore
+   */
+  get serializable() {
+    return this._storage.size > 0 ? this._storage : null;
+  }
+
+  /**
+   * PLEASE NOTE: Only intended for usage within the API itself.
+   * @ignore
+   */
+  get lastModified() {
+    return this._timeStamp.toString();
   }
 }
 

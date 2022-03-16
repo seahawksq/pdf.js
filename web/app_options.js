@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
 
 const compatibilityParams = Object.create(null);
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
@@ -136,7 +140,7 @@ const defaultOptions = {
   },
   printResolution: {
     /** @type {number} */
-    value: 150,
+    value: 300,
     kind: OptionKind.VIEWER,
   },
   renderer: {

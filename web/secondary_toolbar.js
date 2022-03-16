@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
 
 import { SCROLLBAR_PADDING, ScrollMode, SpreadMode } from "./ui_utils.js";
 import { CursorTool } from "./pdf_cursor_tools.js";
@@ -27,7 +31,6 @@ import { PagesCountLimit } from "./base_viewer.js";
  *   dynamically by adjusting the 'max-height' CSS property of this DOM element.
  * @property {HTMLButtonElement} presentationModeButton - Button for entering
  *   presentation mode.
- * @property {HTMLButtonElement} openFileButton - Button to open a file.
  * @property {HTMLButtonElement} printButton - Button to print the document.
  * @property {HTMLButtonElement} downloadButton - Button to download the
  *   document.
@@ -65,7 +68,6 @@ class SecondaryToolbar {
         eventName: "presentationmode",
         close: true,
       },
-      { element: options.openFileButton, eventName: "openfile", close: true },
       { element: options.printButton, eventName: "print", close: true },
       { element: options.downloadButton, eventName: "download", close: true },
       { element: options.viewBookmarkButton, eventName: null, close: true },

@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
 
 import { AppOptions } from "./app_options.js";
 import { PDFViewerApplication } from "./app.js";
@@ -88,7 +92,6 @@ function getViewerConfiguration() {
       zoomIn: document.getElementById("zoomIn"),
       zoomOut: document.getElementById("zoomOut"),
       viewFind: document.getElementById("viewFind"),
-      openFile: document.getElementById("openFile"),
       print: document.getElementById("print"),
       presentationModeButton: document.getElementById("presentationMode"),
       download: document.getElementById("download"),
@@ -103,7 +106,6 @@ function getViewerConfiguration() {
       presentationModeButton: document.getElementById(
         "secondaryPresentationMode"
       ),
-      openFileButton: document.getElementById("secondaryOpenFile"),
       printButton: document.getElementById("secondaryPrint"),
       downloadButton: document.getElementById("secondaryDownload"),
       viewBookmarkButton: document.getElementById("secondaryViewBookmark"),
@@ -193,6 +195,9 @@ function getViewerConfiguration() {
     printContainer: document.getElementById("printContainer"),
     openFileInputName: "fileInput",
     debuggerScriptPath: "./debugger.js",
+    locale: getParameterFromQueryString('lng'),
+    pdfFileName: getParameterFromQueryString('name'),
+    runId: getParameterFromQueryString('id'),
   };
 }
 
@@ -239,6 +244,16 @@ function webViewerLoad() {
 // works in Firefox; see https://bugzilla.mozilla.org/show_bug.cgi?id=1618553
 if (document.blockUnblockOnload) {
   document.blockUnblockOnload(true);
+}
+
+function getParameterFromQueryString(parameterName) {
+  var results = new RegExp('[\?&]' + parameterName + '=([^&#]*)').exec(window.location.href);
+    if (results == null) {
+       return null;
+    }
+    else {
+       return decodeURI(results[1]) || 0;
+    }
 }
 
 if (

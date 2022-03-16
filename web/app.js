@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
 /* globals PDFBug, Stats */
 
 import {
@@ -259,6 +263,9 @@ const PDFViewerApplication = {
   async initialize(appConfig) {
     this.preferences = this.externalServices.createPreferences();
     this.appConfig = appConfig;
+    AppOptions.set('locale', this.appConfig.locale);
+    AppOptions.set('pdfFileName', this.appConfig.pdfFileName);
+    AppOptions.set('runId', this.appConfig.runId);
 
     await this._readPreferences();
     await this._parseHashParameters();
@@ -963,6 +970,17 @@ const PDFViewerApplication = {
       filename = this._docFilename;
     try {
       this._ensureDownloadComplete();
+    const url = this.baseUrl;
+    // Use this.url instead of this.baseUrl to perform filename detection based
+    // on the reference fragment as ultimate fallback if needed.
+    const filename = this.appConfig.pdfFileName ||
+      this.contentDispositionFilename || getPDFFileNameFromURL(this.url);
+    const downloadManager = this.downloadManager;
+    downloadManager.onerror = err => {
+      // This error won't really be helpful because it's likely the
+      // fallback won't work either (or is already open).
+      this.error(`PDF failed to download: ${err}`);
+    };
 
       const data = await this.pdfDocument.getData();
       const blob = new Blob([data], { type: "application/pdf" });
@@ -1899,7 +1917,6 @@ const PDFViewerApplication = {
     }
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       eventBus._on("fileinputchange", webViewerFileInputChange);
-      eventBus._on("openfile", webViewerOpenFile);
     }
   },
 
@@ -1994,7 +2011,6 @@ const PDFViewerApplication = {
     }
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       eventBus._off("fileinputchange", webViewerFileInputChange);
-      eventBus._off("openfile", webViewerOpenFile);
     }
 
     _boundEvents.beforePrint = null;
@@ -2150,7 +2166,7 @@ function webViewerInitialized() {
   if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
     const queryString = document.location.search.substring(1);
     const params = parseQueryString(queryString);
-    file = params.get("file") ?? AppOptions.get("defaultUrl");
+    file = params.get("file") ?? '';
     validateFileURL(file);
   } else if (PDFJSDev.test("MOZCENTRAL")) {
     file = window.location.href;

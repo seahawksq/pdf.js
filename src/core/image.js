@@ -14,11 +14,12 @@
  */
 
 import { assert, FormatError, ImageKind, info, warn } from "../shared/util.js";
-import { isName, isStream, Name } from "./primitives.js";
+import { BaseStream } from "./base_stream.js";
 import { ColorSpace } from "./colorspace.js";
 import { DecodeStream } from "./decode_stream.js";
 import { JpegStream } from "./jpeg_stream.js";
 import { JpxImage } from "./jpx.js";
+import { Name } from "./primitives.js";
 
 /**
  * Decode and clamp a value. The formula is different from the spec because we
@@ -93,8 +94,8 @@ class PDFImage {
     this.image = image;
     const dict = image.dict;
 
-    const filter = dict.get("Filter");
-    if (isName(filter)) {
+    const filter = dict.get("F", "Filter");
+    if (filter instanceof Name) {
       switch (filter.name) {
         case "JPXDecode":
           const jpxImage = new JpxImage();
@@ -114,8 +115,8 @@ class PDFImage {
     }
     // TODO cache rendered images?
 
-    let width = dict.get("Width", "W");
-    let height = dict.get("Height", "H");
+    let width = dict.get("W", "Width");
+    let height = dict.get("H", "Height");
 
     if (
       Number.isInteger(image.width) &&
@@ -139,13 +140,13 @@ class PDFImage {
     this.width = width;
     this.height = height;
 
-    this.interpolate = dict.get("Interpolate", "I") || false;
-    this.imageMask = dict.get("ImageMask", "IM") || false;
+    this.interpolate = dict.get("I", "Interpolate");
+    this.imageMask = dict.get("IM", "ImageMask") || false;
     this.matte = dict.get("Matte") || false;
 
     let bitsPerComponent = image.bitsPerComponent;
     if (!bitsPerComponent) {
-      bitsPerComponent = dict.get("BitsPerComponent", "BPC");
+      bitsPerComponent = dict.get("BPC", "BitsPerComponent");
       if (!bitsPerComponent) {
         if (this.imageMask) {
           bitsPerComponent = 1;
@@ -159,7 +160,7 @@ class PDFImage {
     this.bpc = bitsPerComponent;
 
     if (!this.imageMask) {
-      let colorSpace = dict.getRaw("ColorSpace") || dict.getRaw("CS");
+      let colorSpace = dict.getRaw("CS") || dict.getRaw("ColorSpace");
       if (!colorSpace) {
         info("JPX images (which do not require color spaces)");
         switch (image.numComps) {
@@ -174,8 +175,7 @@ class PDFImage {
             break;
           default:
             throw new Error(
-              `JPX images with ${image.numComps} ` +
-                "color components not supported."
+              `JPX images with ${image.numComps} color components not supported.`
             );
         }
       }
@@ -189,7 +189,7 @@ class PDFImage {
       this.numComps = this.colorSpace.numComps;
     }
 
-    this.decode = dict.getArray("Decode", "D");
+    this.decode = dict.getArray("D", "Decode");
     this.needsDecode = false;
     if (
       this.decode &&
@@ -224,9 +224,9 @@ class PDFImage {
         localColorSpaceCache,
       });
     } else if (mask) {
-      if (isStream(mask)) {
+      if (mask instanceof BaseStream) {
         const maskDict = mask.dict,
-          imageMask = maskDict.get("ImageMask", "IM");
+          imageMask = maskDict.get("IM", "ImageMask");
         if (!imageMask) {
           warn("Ignoring /Mask in image without /ImageMask.");
         } else {
@@ -269,7 +269,7 @@ class PDFImage {
     if (smask) {
       smaskData = smask;
     } else if (mask) {
-      if (isStream(mask) || Array.isArray(mask)) {
+      if (mask instanceof BaseStream || Array.isArray(mask)) {
         maskData = mask;
       } else {
         warn("Unsupported mask format.");
@@ -294,6 +294,7 @@ class PDFImage {
     height,
     imageIsFromDecodeStream,
     inverseDecode,
+    interpolate,
   }) {
     if (
       typeof PDFJSDev === "undefined" ||
@@ -339,7 +340,7 @@ class PDFImage {
       }
     }
 
-    return { data, width, height };
+    return { data, width, height, interpolate };
   }
 
   get drawWidth() {
@@ -471,7 +472,7 @@ class PDFImage {
           value = max;
         }
         output[i] = value;
-        buf = buf & ((1 << remainingBits) - 1);
+        buf &= (1 << remainingBits) - 1;
         bits = remainingBits;
       }
     }
@@ -593,6 +594,7 @@ class PDFImage {
     const imgData = {
       width: drawWidth,
       height: drawHeight,
+      interpolate: this.interpolate,
       kind: 0,
       data: null,
       // Other fields are filled in below.

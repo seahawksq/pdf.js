@@ -14,9 +14,10 @@
  */
 
 import { bytesToString, escapeString, warn } from "../shared/util.js";
-import { Dict, isDict, isName, isRef, isStream, Name } from "./primitives.js";
+import { Dict, Name, Ref } from "./primitives.js";
 import { escapePDFName, parseXFAPath } from "./core_utils.js";
 import { SimpleDOMNode, SimpleXMLParser } from "./xml_parser.js";
+import { BaseStream } from "./base_stream.js";
 import { calculateMD5 } from "./crypto.js";
 
 function writeDict(dict, buffer, transform) {
@@ -70,9 +71,9 @@ function numberToString(value) {
 }
 
 function writeValue(value, buffer, transform) {
-  if (isName(value)) {
+  if (value instanceof Name) {
     buffer.push(`/${escapePDFName(value.name)}`);
-  } else if (isRef(value)) {
+  } else if (value instanceof Ref) {
     buffer.push(`${value.num} ${value.gen} R`);
   } else if (Array.isArray(value)) {
     writeArray(value, buffer, transform);
@@ -83,10 +84,16 @@ function writeValue(value, buffer, transform) {
     buffer.push(`(${escapeString(value)})`);
   } else if (typeof value === "number") {
     buffer.push(numberToString(value));
-  } else if (isDict(value)) {
+  } else if (typeof value === "boolean") {
+    buffer.push(value.toString());
+  } else if (value instanceof Dict) {
     writeDict(value, buffer, transform);
-  } else if (isStream(value)) {
+  } else if (value instanceof BaseStream) {
     writeStream(value, buffer, transform);
+  } else if (value === null) {
+    buffer.push("null");
+  } else {
+    warn(`Unhandled value in writer: ${typeof value}, please file a bug.`);
   }
 }
 
@@ -123,12 +130,7 @@ function computeMD5(filesize, xrefInfo) {
   return bytesToString(calculateMD5(array));
 }
 
-function updateXFA(datasetsRef, newRefs, xref) {
-  if (datasetsRef === null || xref === null) {
-    return;
-  }
-  const datasets = xref.fetchIfRef(datasetsRef);
-  const str = datasets.getString();
+function writeXFADataForAcroform(str, newRefs) {
   const xml = new SimpleXMLParser({ hasAttributes: true }).parseFromString(str);
 
   for (const { xfa } of newRefs) {
@@ -148,23 +150,77 @@ function updateXFA(datasetsRef, newRefs, xref) {
   }
   const buffer = [];
   xml.documentElement.dump(buffer);
-  let updatedXml = buffer.join("");
+  return buffer.join("");
+}
+
+function updateXFA({
+  xfaData,
+  xfaDatasetsRef,
+  hasXfaDatasetsEntry,
+  acroFormRef,
+  acroForm,
+  newRefs,
+  xref,
+  xrefInfo,
+}) {
+  if (xref === null) {
+    return;
+  }
+
+  if (!hasXfaDatasetsEntry) {
+    if (!acroFormRef) {
+      warn("XFA - Cannot save it");
+      return;
+    }
+
+    // We've a XFA array which doesn't contain a datasets entry.
+    // So we'll update the AcroForm dictionary to have an XFA containing
+    // the datasets.
+    const oldXfa = acroForm.get("XFA");
+    const newXfa = oldXfa.slice();
+    newXfa.splice(2, 0, "datasets");
+    newXfa.splice(3, 0, xfaDatasetsRef);
+
+    acroForm.set("XFA", newXfa);
+
+    const encrypt = xref.encrypt;
+    let transform = null;
+    if (encrypt) {
+      transform = encrypt.createCipherTransform(
+        acroFormRef.num,
+        acroFormRef.gen
+      );
+    }
+
+    const buffer = [`${acroFormRef.num} ${acroFormRef.gen} obj\n`];
+    writeDict(acroForm, buffer, transform);
+    buffer.push("\n");
+
+    acroForm.set("XFA", oldXfa);
+
+    newRefs.push({ ref: acroFormRef, data: buffer.join("") });
+  }
+
+  if (xfaData === null) {
+    const datasets = xref.fetchIfRef(xfaDatasetsRef);
+    xfaData = writeXFADataForAcroform(datasets.getString(), newRefs);
+  }
 
   const encrypt = xref.encrypt;
   if (encrypt) {
     const transform = encrypt.createCipherTransform(
-      datasetsRef.num,
-      datasetsRef.gen
+      xfaDatasetsRef.num,
+      xfaDatasetsRef.gen
     );
-    updatedXml = transform.encryptString(updatedXml);
+    xfaData = transform.encryptString(xfaData);
   }
   const data =
-    `${datasetsRef.num} ${datasetsRef.gen} obj\n` +
-    `<< /Type /EmbeddedFile /Length ${updatedXml.length}>>\nstream\n` +
-    updatedXml +
+    `${xfaDatasetsRef.num} ${xfaDatasetsRef.gen} obj\n` +
+    `<< /Type /EmbeddedFile /Length ${xfaData.length}>>\nstream\n` +
+    xfaData +
     "\nendstream\nendobj\n";
 
-  newRefs.push({ ref: datasetsRef, data });
+  newRefs.push({ ref: xfaDatasetsRef, data });
 }
 
 function incrementalUpdate({
@@ -172,9 +228,25 @@ function incrementalUpdate({
   xrefInfo,
   newRefs,
   xref = null,
-  datasetsRef = null,
+  hasXfa = false,
+  xfaDatasetsRef = null,
+  hasXfaDatasetsEntry = false,
+  acroFormRef = null,
+  acroForm = null,
+  xfaData = null,
 }) {
-  updateXFA(datasetsRef, newRefs, xref);
+  if (hasXfa) {
+    updateXFA({
+      xfaData,
+      xfaDatasetsRef,
+      hasXfaDatasetsEntry,
+      acroFormRef,
+      acroForm,
+      newRefs,
+      xref,
+      xrefInfo,
+    });
+  }
 
   const newXref = new Dict(null);
   const refForXrefTable = xrefInfo.newRef;

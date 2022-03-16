@@ -26,8 +26,8 @@ class Event {
     this.richChange = data.richChange || [];
     this.richChangeEx = data.richChangeEx || [];
     this.richValue = data.richValue || [];
-    this.selEnd = data.selEnd || -1;
-    this.selStart = data.selStart || -1;
+    this.selEnd = data.selEnd ?? -1;
+    this.selStart = data.selStart ?? -1;
     this.shift = data.shift || false;
     this.source = data.source || null;
     this.target = data.target || null;
@@ -79,6 +79,13 @@ class EventDispatcher {
           baseEvent.actions,
           baseEvent.pageNumber
         );
+      } else if (id === "app" && baseEvent.name === "ResetForm") {
+        for (const fieldId of baseEvent.ids) {
+          const obj = this._objects[fieldId];
+          if (obj) {
+            obj.obj._reset();
+          }
+        }
       }
       return;
     }
@@ -143,6 +150,14 @@ class EventDispatcher {
           id: source.obj._id,
           value: savedChange.value,
           selRange: [savedChange.selStart, savedChange.selEnd],
+        });
+      } else {
+        // Entry is not valid (rc == false) and it's a commit
+        // so just clear the field.
+        source.obj._send({
+          id: source.obj._id,
+          value: "",
+          selRange: [0, 0],
         });
       }
     }

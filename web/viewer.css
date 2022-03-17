@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /* Copyright 2021 Microsoft
+/* Copyright 2021 Microsoft
  * This file has been modified by Microsoft to add support for document
  * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
  */
@@ -1541,7 +1541,24 @@ html[dir="rtl"] .treeItemToggler::before {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
+#overlayContainer > .container > .modal {
+  display: inline-block;
+  padding: 15px;
+  border-spacing: 4px;
+  color: var(--main-color);
+  font-size: 12px;
+  line-height: 14px;
+  background-color: var(--doorhanger-bg-color);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
 .dialog > .row {
+  display: table-row;
+}
+
+.modal > .row {
   display: table-row;
 }
 
@@ -1549,7 +1566,15 @@ html[dir="rtl"] .treeItemToggler::before {
   display: table-cell;
 }
 
+.modal > .row > * {
+  display: table-cell;
+}
+
 .dialog .toolbarField {
+  margin: 5px 0;
+}
+
+.modal .toolbarField {
   margin: 5px 0;
 }
 
@@ -1561,7 +1586,20 @@ html[dir="rtl"] .treeItemToggler::before {
   background-color: var(--separator-color);
 }
 
+.modal .separator {
+  display: block;
+  margin: 4px 0;
+  height: 1px;
+  width: 100%;
+  background-color: var(--separator-color);
+}
+
 .dialog .buttonRow {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.modal .buttonRow {
   text-align: center;
   vertical-align: middle;
 }
@@ -1577,7 +1615,7 @@ html[dir="rtl"] .treeItemToggler::before {
   width: 200px;
 }
 
-#documentPropertiesOverlay > .dialog {
+#documentPropertiesOverlay > .modal {
   text-align: left;
 }
 #documentPropertiesOverlay .row > * {

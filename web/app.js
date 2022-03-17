@@ -263,9 +263,9 @@ const PDFViewerApplication = {
   async initialize(appConfig) {
     this.preferences = this.externalServices.createPreferences();
     this.appConfig = appConfig;
-    AppOptions.set('locale', this.appConfig.locale);
-    AppOptions.set('pdfFileName', this.appConfig.pdfFileName);
-    AppOptions.set('runId', this.appConfig.runId);
+    AppOptions.set("locale", this.appConfig.locale);
+    AppOptions.set("pdfFileName", this.appConfig.pdfFileName);
+    AppOptions.set("runId", this.appConfig.runId);
 
     await this._readPreferences();
     await this._parseHashParameters();
@@ -966,21 +966,23 @@ const PDFViewerApplication = {
   },
 
   async download({ sourceEventType = "download" } = {}) {
-    const url = this._downloadUrl,
+    let url = this._downloadUrl,
       filename = this._docFilename;
     try {
       this._ensureDownloadComplete();
-    const url = this.baseUrl;
-    // Use this.url instead of this.baseUrl to perform filename detection based
-    // on the reference fragment as ultimate fallback if needed.
-    const filename = this.appConfig.pdfFileName ||
-      this.contentDispositionFilename || getPDFFileNameFromURL(this.url);
-    const downloadManager = this.downloadManager;
-    downloadManager.onerror = err => {
-      // This error won't really be helpful because it's likely the
-      // fallback won't work either (or is already open).
-      this.error(`PDF failed to download: ${err}`);
-    };
+      url = this.baseUrl;
+      // Use this.url instead of this.baseUrl to perform filename detection
+      // based on the reference fragment as ultimate fallback if needed.
+      filename =
+        this.appConfig.pdfFileName ||
+        this.contentDispositionFilename ||
+        getPdfFilenameFromUrl(this.url);
+      const downloadManager = this.downloadManager;
+      downloadManager.onerror = err => {
+        // This error won't really be helpful because it's likely the
+        // fallback won't work either (or is already open).
+        this.error(`PDF failed to download: ${err}`);
+      };
 
       const data = await this.pdfDocument.getData();
       const blob = new Blob([data], { type: "application/pdf" });
@@ -2166,7 +2168,7 @@ function webViewerInitialized() {
   if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
     const queryString = document.location.search.substring(1);
     const params = parseQueryString(queryString);
-    file = params.get("file") ?? '';
+    file = params.get("file") ?? "";
     validateFileURL(file);
   } else if (PDFJSDev.test("MOZCENTRAL")) {
     file = window.location.href;
@@ -2463,7 +2465,7 @@ function webViewerHashchange(evt) {
   }
 }
 
-let webViewerFileInputChange, webViewerOpenFile;
+let webViewerFileInputChange;
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
   webViewerFileInputChange = function (evt) {
     if (PDFViewerApplication.pdfViewer?.isInPresentationMode) {
@@ -2476,11 +2478,6 @@ if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       url = { url, originalUrl: file.name };
     }
     PDFViewerApplication.open(url);
-  };
-
-  webViewerOpenFile = function (evt) {
-    const openFileInputName = PDFViewerApplication.appConfig.openFileInputName;
-    document.getElementById(openFileInputName).click();
   };
 }
 

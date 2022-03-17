@@ -195,9 +195,9 @@ function getViewerConfiguration() {
     printContainer: document.getElementById("printContainer"),
     openFileInputName: "fileInput",
     debuggerScriptPath: "./debugger.js",
-    locale: getParameterFromQueryString('lng'),
-    pdfFileName: getParameterFromQueryString('name'),
-    runId: getParameterFromQueryString('id'),
+    locale: getParameterFromQueryString("lng"),
+    pdfFileName: getParameterFromQueryString("name"),
+    runId: getParameterFromQueryString("id"),
   };
 }
 
@@ -247,13 +247,13 @@ if (document.blockUnblockOnload) {
 }
 
 function getParameterFromQueryString(parameterName) {
-  var results = new RegExp('[\?&]' + parameterName + '=([^&#]*)').exec(window.location.href);
-    if (results == null) {
-       return null;
-    }
-    else {
-       return decodeURI(results[1]) || 0;
-    }
+  const results = new RegExp("[?&]" + parameterName + "=([^&#]*)").exec(
+    window.location.href
+  );
+  if (results === null) {
+    return null;
+  }
+  return decodeURI(results[1]) || 0;
 }
 
 if (

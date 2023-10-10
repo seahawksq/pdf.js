@@ -33,9 +33,9 @@ import { JpxImage } from "./core/jpx.js";
 //  - URL
 
 // eslint-disable-next-line no-unused-vars
-const pdfjsVersion = PDFJSDev.eval("BUNDLE_VERSION");
+const pdfjsVersion = PDFJSDev.eval("BUNDLE_VERSION"); // CodeQL [SM04509] This usage is decided by this third party library. Skipping
 // eslint-disable-next-line no-unused-vars
-const pdfjsBuild = PDFJSDev.eval("BUNDLE_BUILD");
+const pdfjsBuild = PDFJSDev.eval("BUNDLE_BUILD"); // CodeQL [SM04509] This usage is decided by this third party library. Skipping
 
 export {
   getVerbosityLevel,

@@ -17,9 +17,9 @@ import ModuleLoader from "../external/quickjs/quickjs-eval.js";
 import { SandboxSupportBase } from "./pdf.sandbox.external.js";
 
 /* eslint-disable-next-line no-unused-vars */
-const pdfjsVersion = PDFJSDev.eval("BUNDLE_VERSION");
+const pdfjsVersion = PDFJSDev.eval("BUNDLE_VERSION"); // CodeQL [SM04509] This usage is decided by this third party library. Skipping
 /* eslint-disable-next-line no-unused-vars */
-const pdfjsBuild = PDFJSDev.eval("BUNDLE_BUILD");
+const pdfjsBuild = PDFJSDev.eval("BUNDLE_BUILD"); // CodeQL [SM04509] This usage is decided by this third party library. Skipping
 
 class SandboxSupport extends SandboxSupportBase {
   exportValueToSandbox(val) {
@@ -58,7 +58,7 @@ class Sandbox {
     if (PDFJSDev.test("!PRODUCTION || TESTING")) {
       this._module.ccall("nukeSandbox", null, []);
     }
-    const code = [PDFJSDev.eval("PDF_SCRIPTING_JS_SOURCE")];
+    const code = [PDFJSDev.eval("PDF_SCRIPTING_JS_SOURCE")]; // CodeQL [SM04509] This usage is decided by this third party library. Skipping
 
     if (PDFJSDev.test("!PRODUCTION || TESTING")) {
       code.push(

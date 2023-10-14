@@ -84,7 +84,6 @@ Note that we only mention the most relevant files and folders.
 │   └── pdf.worker.js.map                  - core layer's source map
 ├── web/
 │   ├── cmaps/                             - character maps (required by core)
-│   ├── compressed.tracemonkey-pldi-09.pdf - PDF file for testing purposes
 │   ├── debugger.js                        - helpful debugging features
 │   ├── images/                            - images for the viewer and annotation icons
 │   ├── locale/                            - translation files

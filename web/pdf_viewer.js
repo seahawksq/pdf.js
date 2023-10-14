@@ -35,7 +35,6 @@ import {
   PermissionFlag,
   PixelsPerInch,
   PromiseCapability,
-  shadow,
   version,
 } from "pdfjs-lib";
 import {
@@ -280,6 +279,13 @@ class PDFViewer {
     this.enablePrintAutoRotate = options.enablePrintAutoRotate || false;
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       this.removePageBorders = options.removePageBorders || false;
+
+      if (options.useOnlyCssZoom) {
+        console.error(
+          "useOnlyCssZoom was removed, please use `maxCanvasPixels = 0` instead."
+        );
+        options.maxCanvasPixels = 0;
+      }
     }
     this.isOffscreenCanvasSupported =
       options.isOffscreenCanvasSupported ?? true;
@@ -543,9 +549,9 @@ class PDFViewer {
     return this.pdfDocument ? this._pagesCapability.promise : null;
   }
 
-  get _layerProperties() {
+  #layerProperties() {
     const self = this;
-    return shadow(this, "_layerProperties", {
+    return {
       get annotationEditorUIManager() {
         return self.#annotationEditorUIManager;
       },
@@ -570,7 +576,7 @@ class PDFViewer {
       get linkService() {
         return self.linkService;
       },
-    });
+    };
   }
 
   /**
@@ -864,6 +870,7 @@ class PDFViewer {
           }
         }
 
+        const layerProperties = this.#layerProperties.bind(this);
         const viewerElement =
           this._scrollMode === ScrollMode.PAGE ? null : this.viewer;
         const scale = this.currentScale;
@@ -904,7 +911,7 @@ class PDFViewer {
             maxCanvasPixels: this.maxCanvasPixels,
             pageColors: this.pageColors,
             l10n: this.l10n,
-            layerProperties: this._layerProperties,
+            layerProperties,
           });
           this._pages.push(pageView);
         }
@@ -2208,7 +2215,7 @@ class PDFViewer {
   /**
    * @param {number} mode - AnnotationEditor mode (None, FreeText, Ink, ...)
    */
-  set annotationEditorMode({ mode, editId = null, isFromKeyboard = false }) {
+  set annotationEditorMode({ mode, editId = null }) {
     if (!this.#annotationEditorUIManager) {
       throw new Error(`The AnnotationEditor is not enabled.`);
     }
@@ -2227,7 +2234,7 @@ class PDFViewer {
       mode,
     });
 
-    this.#annotationEditorUIManager.updateMode(mode, editId, isFromKeyboard);
+    this.#annotationEditorUIManager.updateMode(mode, editId);
   }
 
   // eslint-disable-next-line accessor-pairs

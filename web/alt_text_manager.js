@@ -264,7 +264,6 @@ class AltTextManager {
     this.#removeOnClickListeners();
     this.#uiManager?.addEditListeners();
     this.#eventBus._off("resize", this.#boundSetPosition);
-    this.#currentEditor.altTextFinish();
     this.#currentEditor = null;
     this.#uiManager = null;
   }

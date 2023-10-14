@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
+
 import {
   animationStarted,
   apiPageLayoutToViewerModes,
@@ -44,6 +49,7 @@ import {
   InvalidPDFException,
   isDataScheme,
   isPdfFile,
+  loadScript,
   MissingPDFException,
   PDFWorker,
   PromiseCapability,
@@ -705,12 +711,12 @@ const PDFViewerApplication = {
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       const queryString = document.location.search.substring(1);
       const params = parseQueryString(queryString);
-      file = params.get("file") ?? AppOptions.get("defaultUrl");
+      file = params.get("file") ?? '';
       validateFileURL(file);
     } else if (PDFJSDev.test("MOZCENTRAL")) {
       file = window.location.href;
     } else if (PDFJSDev.test("CHROME")) {
-      file = AppOptions.get("defaultUrl");
+      file = '';
     }
 
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
@@ -944,7 +950,7 @@ const PDFViewerApplication = {
   get _docFilename() {
     // Use `this.url` instead of `this.baseUrl` to perform filename detection
     // based on the reference fragment as ultimate fallback if needed.
-    return this._contentDispositionFilename || getPdfFilenameFromUrl(this.url);
+    return this.appConfig.pdfFileName || this._contentDispositionFilename || getPdfFilenameFromUrl(this.url);
   },
 
   /**
@@ -1039,6 +1045,22 @@ const PDFViewerApplication = {
    * @returns {Promise} - Promise that is resolved when the document is opened.
    */
   async open(args) {
+    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
+      let deprecatedArgs = false;
+      if (typeof args === "string") {
+        args = { url: args }; // URL
+        deprecatedArgs = true;
+      } else if (args?.byteLength) {
+        args = { data: args }; // ArrayBuffer
+        deprecatedArgs = true;
+      }
+      if (deprecatedArgs) {
+        console.error(
+          "The `PDFViewerApplication.open` signature was updated, please use an object instead."
+        );
+      }
+    }
+
     if (this.pdfLoadingTask) {
       // We need to destroy already opened document.
       await this.close();
@@ -1816,9 +1838,7 @@ const PDFViewerApplication = {
     this.pdfViewer.cleanup();
     this.pdfThumbnailViewer?.cleanup();
 
-    this.pdfDocument.cleanup(
-      /* keepLoadedFonts = */ AppOptions.get("fontExtraProperties")
-    );
+    this.pdfDocument.cleanup();
   },
 
   forceRendering() {
@@ -2265,10 +2285,10 @@ async function loadFakeWorker() {
   GlobalWorkerOptions.workerSrc ||= AppOptions.get("workerSrc");
 
   if (typeof PDFJSDev === "undefined") {
-    globalThis.pdfjsWorker = await import("pdfjs/pdf.worker.js");
+    window.pdfjsWorker = await import("pdfjs/pdf.worker.js");
     return;
   }
-  await __non_webpack_import__(PDFWorker.workerSrc); // eslint-disable-line no-undef
+  await loadScript(PDFWorker.workerSrc);
 }
 
 async function loadPDFBug(self) {
@@ -3101,8 +3121,6 @@ function webViewerKeyDown(evt) {
     curElementTagName === "INPUT" ||
     curElementTagName === "TEXTAREA" ||
     curElementTagName === "SELECT" ||
-    (curElementTagName === "BUTTON" &&
-      (evt.keyCode === /* Enter = */ 13 || evt.keyCode === /* Space = */ 32)) ||
     curElement?.isContentEditable
   ) {
     // Make sure that the secondary toolbar is closed when Escape is pressed.

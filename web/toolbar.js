@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
+
 import {
   animationStarted,
   DEFAULT_SCALE,
@@ -40,7 +45,6 @@ const PAGE_NUMBER_LOADING_INDICATOR = "visiblePageIsLoading";
  * @property {HTMLButtonElement} zoomIn - Button to zoom in the pages.
  * @property {HTMLButtonElement} zoomOut - Button to zoom out the pages.
  * @property {HTMLButtonElement} viewFind - Button to open find bar.
- * @property {HTMLButtonElement} openFile - Button to open a new document.
  * @property {HTMLButtonElement} editorFreeTextButton - Button to switch to
  *   FreeText editing.
  * @property {HTMLButtonElement} download - Button to download the document.
@@ -102,9 +106,6 @@ class Toolbar {
         },
       },
     ];
-    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
-      this.buttons.push({ element: options.openFile, eventName: "openfile" });
-    }
     this.items = {
       numPages: options.numPages,
       pageNumber: options.pageNumber,
@@ -162,12 +163,7 @@ class Toolbar {
     for (const { element, eventName, eventDetails } of this.buttons) {
       element.addEventListener("click", evt => {
         if (eventName !== null) {
-          this.eventBus.dispatch(eventName, {
-            source: this,
-            ...eventDetails,
-            // evt.detail is the number of clicks.
-            isFromKeyboard: evt.detail === 0,
-          });
+          this.eventBus.dispatch(eventName, { source: this, ...eventDetails });
         }
       });
     }

@@ -132,7 +132,7 @@ class DownloadManager {
   /**
    * @returns {boolean} Indicating if the data was opened.
    */
-  openOrDownloadData(element, data, filename, dest = null) {
+  openOrDownloadData(element, data, filename) {
     const isPdfData = isPdfFile(filename);
     const contentType = isPdfData ? "application/pdf" : "";
 
@@ -143,10 +143,7 @@ class DownloadManager {
         this.#openBlobUrls.set(element, blobUrl);
       }
       // Let Firefox's content handler catch the URL and display the PDF.
-      let viewerUrl = blobUrl + "?filename=" + encodeURIComponent(filename);
-      if (dest) {
-        viewerUrl += `#${escape(dest)}`;
-      }
+      const viewerUrl = blobUrl + "#filename=" + encodeURIComponent(filename);
 
       try {
         window.open(viewerUrl);

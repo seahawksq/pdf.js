@@ -20,6 +20,13 @@ Adobe CMap resources are covered by their own copyright but the same license:
 
 See https://github.com/adobe-type-tools/cmap-resources
 -->
+
+<!--
+  Copyright 2021 Microsoft
+  This file has been modified by Microsoft to add support for document
+  presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+-->
+
 <html dir="ltr" mozdisallowselectionprint>
   <head>
     <meta charset="utf-8">
@@ -33,6 +40,8 @@ See https://github.com/adobe-type-tools/cmap-resources
 <!--#include viewer-snippet-firefox-extension.html-->
 <!--#elif CHROME-->
 <!--#include viewer-snippet-chrome-extension.html-->
+<!--#elif MINIFIED-->
+<!--#include viewer-snippet-minified.html-->
 <!--#else-->
 <!--#include viewer-snippet.html-->
 <!--#endif-->
@@ -44,9 +53,9 @@ See https://github.com/adobe-type-tools/cmap-resources
 <!--#endif-->
 
 <!--#if MOZCENTRAL-->
-<!--<script src="resource://pdf.js/web/viewer.mjs" type="module"></script>-->
-<!--#elif !MOZCENTRAL-->
-<!--<script src="viewer.mjs" type="module"></script>-->
+<!--<script src="resource://pdf.js/web/viewer.js"></script>-->
+<!--#elif !MINIFIED-->
+<!--<script src="viewer.js"></script>-->
 <!--#elif /* Development mode. */-->
     <link rel="resource" type="application/l10n" href="locale/locale.properties">
 
@@ -63,6 +72,7 @@ See https://github.com/adobe-type-tools/cmap-resources
           "display-network": "../src/display/network.js",
           "display-node_stream": "../src/display/stubs.js",
           "display-node_utils": "../src/display/stubs.js",
+          "display-svg": "../src/display/stubs.js",
 
           "web-alt_text_manager": "./alt_text_manager.js",
           "web-annotation_editor_params": "./annotation_editor_params.js",
@@ -206,11 +216,6 @@ See https://github.com/adobe-type-tools/cmap-resources
 
         <div id="secondaryToolbar" class="secondaryToolbar hidden doorHangerRight">
           <div id="secondaryToolbarButtonContainer">
-<!--#if GENERIC-->
-            <button id="secondaryOpenFile" class="secondaryToolbarButton visibleLargeView" title="Open File" tabindex="51" data-l10n-id="open_file">
-              <span data-l10n-id="open_file_label">Open</span>
-            </button>
-<!--#endif-->
 
             <button id="secondaryPrint" class="secondaryToolbarButton visibleMediumView" title="Print" tabindex="52" data-l10n-id="print">
               <span data-l10n-id="print_label">Print</span>
@@ -293,12 +298,6 @@ See https://github.com/adobe-type-tools/cmap-resources
                 <span data-l10n-id="spread_even_label">Even Spreads</span>
               </button>
             </div>
-
-            <div class="horizontalToolbarSeparator"></div>
-
-            <button id="documentProperties" class="secondaryToolbarButton" title="Document Properties…" tabindex="69" data-l10n-id="document_properties" aria-controls="documentPropertiesDialog">
-              <span data-l10n-id="document_properties_label">Document Properties…</span>
-            </button>
           </div>
         </div>  <!-- secondaryToolbar -->
 
@@ -326,11 +325,6 @@ See https://github.com/adobe-type-tools/cmap-resources
                 <span id="numPages" class="toolbarLabel"></span>
               </div>
               <div id="toolbarViewerRight">
-<!--#if GENERIC-->
-                <button id="openFile" class="toolbarButton hiddenLargeView" title="Open File" tabindex="31" data-l10n-id="open_file">
-                  <span data-l10n-id="open_file_label">Open</span>
-                </button>
-<!--#endif-->
 
                 <button id="print" class="toolbarButton hiddenMediumView" title="Print" tabindex="32" data-l10n-id="print">
                   <span data-l10n-id="print_label">Print</span>

@@ -111,29 +111,21 @@ const FontInspector = (function FontInspectorClosure() {
         }
         return moreInfo;
       }
-
-      const moreInfo = fontObj.css
-        ? properties(fontObj, ["baseFontName"])
-        : properties(fontObj, ["name", "type"]);
-
+      const moreInfo = properties(fontObj, ["name", "type"]);
       const fontName = fontObj.loadedName;
       const font = document.createElement("div");
       const name = document.createElement("span");
       name.textContent = fontName;
-      let download;
-      if (!fontObj.css) {
-        download = document.createElement("a");
-        if (url) {
-          url = /url\(['"]?([^)"']+)/.exec(url);
-          download.href = url[1];
-        } else if (fontObj.data) {
-          download.href = URL.createObjectURL(
-            new Blob([fontObj.data], { type: fontObj.mimetype })
-          );
-        }
-        download.textContent = "Download";
+      const download = document.createElement("a");
+      if (url) {
+        url = /url\(['"]?([^)"']+)/.exec(url);
+        download.href = url[1];
+      } else if (fontObj.data) {
+        download.href = URL.createObjectURL(
+          new Blob([fontObj.data], { type: fontObj.mimetype })
+        );
       }
-
+      download.textContent = "Download";
       const logIt = document.createElement("a");
       logIt.href = "";
       logIt.textContent = "Log";
@@ -147,11 +139,7 @@ const FontInspector = (function FontInspectorClosure() {
       select.addEventListener("click", function () {
         selectFont(fontName, select.checked);
       });
-      if (download) {
-        font.append(select, name, " ", download, " ", logIt, moreInfo);
-      } else {
-        font.append(select, name, " ", logIt, moreInfo);
-      }
+      font.append(select, name, " ", download, " ", logIt, moreInfo);
       fonts.append(font);
       // Somewhat of a hack, should probably add a hook for when the text layer
       // is done rendering.
@@ -586,7 +574,7 @@ class PDFBug {
 
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = url.replace(/\.mjs$/, ".css");
+    link.href = url.replace(/.js$/, ".css");
 
     document.head.append(link);
   }

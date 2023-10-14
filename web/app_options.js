@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
+
 const compatibilityParams = Object.create(null);
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
   if (
@@ -166,7 +171,7 @@ const defaultOptions = {
   },
   printResolution: {
     /** @type {number} */
-    value: 150,
+    value: 300,
     kind: OptionKind.VIEWER,
   },
   sidebarViewOnLoad: {
@@ -300,15 +305,15 @@ const defaultOptions = {
       typeof PDFJSDev === "undefined"
         ? "../src/pdf.worker.js"
         : PDFJSDev.test("MOZCENTRAL")
-        ? "resource://pdf.js/build/pdf.worker.mjs"
-        : "../build/pdf.worker.mjs",
+        ? "resource://pdf.js/build/pdf.worker.js"
+        : "../build/pdf.worker.js",
     kind: OptionKind.WORKER,
   },
 };
 if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
   defaultOptions.defaultUrl = {
     /** @type {string} */
-    value: "compressed.tracemonkey-pldi-09.pdf",
+    value: "",
     kind: OptionKind.VIEWER,
   };
   defaultOptions.disablePreferences = {
@@ -325,8 +330,8 @@ if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
     /** @type {string} */
     value:
       typeof PDFJSDev === "undefined"
-        ? "../build/dev-sandbox/pdf.sandbox.mjs"
-        : "../build/pdf.sandbox.mjs",
+        ? "../build/dev-sandbox/pdf.sandbox.js"
+        : "../build/pdf.sandbox.js",
     kind: OptionKind.VIEWER,
   };
 } else if (PDFJSDev.test("CHROME")) {

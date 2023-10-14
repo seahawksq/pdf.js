@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
+
 import {
   CursorTool,
   ScrollMode,
@@ -29,7 +34,6 @@ import { PagesCountLimit } from "./pdf_viewer.js";
  *   of the secondary toolbar.
  * @property {HTMLButtonElement} presentationModeButton - Button for entering
  *   presentation mode.
- * @property {HTMLButtonElement} openFileButton - Button to open a file.
  * @property {HTMLButtonElement} printButton - Button to print the document.
  * @property {HTMLButtonElement} downloadButton - Button to download the
  *   document.
@@ -47,8 +51,6 @@ import { PagesCountLimit } from "./pdf_viewer.js";
  *   select tool.
  * @property {HTMLButtonElement} cursorHandToolButton - Button to enable the
  *   hand tool.
- * @property {HTMLButtonElement} documentPropertiesButton - Button for opening
- *   the document properties dialog.
  */
 
 class SecondaryToolbar {
@@ -134,19 +136,7 @@ class SecondaryToolbar {
         eventDetails: { mode: SpreadMode.EVEN },
         close: true,
       },
-      {
-        element: options.documentPropertiesButton,
-        eventName: "documentproperties",
-        close: true,
-      },
     ];
-    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
-      this.buttons.push({
-        element: options.openFileButton,
-        eventName: "openfile",
-        close: true,
-      });
-    }
     this.items = {
       firstPage: options.firstPageButton,
       lastPage: options.lastPageButton,

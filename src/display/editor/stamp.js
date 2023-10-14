@@ -32,8 +32,6 @@ class StampEditor extends AnnotationEditor {
 
   #bitmapFile = null;
 
-  #bitmapFileName = "";
-
   #canvas = null;
 
   #observer = null;
@@ -45,8 +43,6 @@ class StampEditor extends AnnotationEditor {
   #hasBeenAddedInUndoStack = false;
 
   static _type = "stamp";
-
-  static _editorType = AnnotationEditorType.STAMP;
 
   constructor(params) {
     super({ ...params, name: "stampEditor" });
@@ -105,9 +101,6 @@ class StampEditor extends AnnotationEditor {
     if (!fromId) {
       this.#bitmapId = data.id;
       this.#isSvg = data.isSvg;
-    }
-    if (data.file) {
-      this.#bitmapFileName = data.file.name;
     }
     this.#createCanvas();
   }
@@ -195,10 +188,6 @@ class StampEditor extends AnnotationEditor {
       this.#canvas = null;
       this.#observer?.disconnect();
       this.#observer = null;
-      if (this.#resizeTimeoutId) {
-        clearTimeout(this.#resizeTimeoutId);
-        this.#resizeTimeoutId = null;
-      }
     }
     super.remove();
   }
@@ -337,9 +326,6 @@ class StampEditor extends AnnotationEditor {
       },
     });
     this.addAltTextButton();
-    if (this.#bitmapFileName) {
-      canvas.setAttribute("aria-label", this.#bitmapFileName);
-    }
   }
 
   /**
@@ -444,11 +430,6 @@ class StampEditor extends AnnotationEditor {
       width,
       height
     );
-  }
-
-  /** @inheritdoc */
-  getImageForAltText() {
-    return this.#canvas;
   }
 
   #serializeBitmap(toUrl) {

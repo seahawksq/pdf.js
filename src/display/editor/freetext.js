@@ -132,8 +132,6 @@ class FreeTextEditor extends AnnotationEditor {
 
   static _type = "freetext";
 
-  static _editorType = AnnotationEditorType.FREETEXT;
-
   constructor(params) {
     super({ ...params, name: "freeTextEditor" });
     this.#color =
@@ -337,7 +335,7 @@ class FreeTextEditor extends AnnotationEditor {
 
     // In case the blur callback hasn't been called.
     this.isEditing = false;
-    this.parent.div.classList.add("freetextEditing");
+    this.parent.div.classList.add("freeTextEditing");
   }
 
   /** @inheritdoc */
@@ -376,7 +374,7 @@ class FreeTextEditor extends AnnotationEditor {
     this.isEditing = false;
     if (this.parent) {
       this.parent.setEditingState(true);
-      this.parent.div.classList.add("freetextEditing");
+      this.parent.div.classList.add("freeTextEditing");
     }
     super.remove();
   }
@@ -510,7 +508,7 @@ class FreeTextEditor extends AnnotationEditor {
   }
 
   editorDivInput(event) {
-    this.parent.div.classList.toggle("freetextEditing", this.isEmpty());
+    this.parent.div.classList.toggle("freeTextEditing", this.isEmpty());
   }
 
   /** @inheritdoc */
@@ -651,7 +649,6 @@ class FreeTextEditor extends AnnotationEditor {
     }
   }
 
-  /** @inheritdoc */
   get contentDiv() {
     return this.editorDiv;
   }

@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
+
 const DEFAULT_SCALE_VALUE = "auto";
 const DEFAULT_SCALE = 1.0;
 const DEFAULT_SCALE_DELTA = 1.1;
@@ -119,7 +124,6 @@ function scrollIntoView(element, spot, scrollMatches = false) {
   // producing the error. See also animationStarted.
   let parent = element.offsetParent;
   if (!parent) {
-    console.error("offsetParent is not set -- cannot scroll");
     return;
   }
   let offsetY = element.offsetTop + element.clientTop;

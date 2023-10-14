@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/* Copyright 2021 Microsoft
+ * This file has been modified by Microsoft to add support for document
+ * presentation in Microsoft Dynamics 365 - Finance & Operations web client.
+ */
+
 import "web-com";
 import "web-print_service";
 import { RenderingStates, ScrollMode, SpreadMode } from "./ui_utils.js";
@@ -53,9 +58,9 @@ function getViewerConfiguration() {
       zoomOut: document.getElementById("zoomOut"),
       viewFind: document.getElementById("viewFind"),
       openFile:
-        typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
-          ? document.getElementById("openFile")
-          : null,
+      typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
+        ? document.getElementById("openFile")
+        : null,
       print: document.getElementById("print"),
       editorFreeTextButton: document.getElementById("editorFreeText"),
       editorFreeTextParamsToolbar: document.getElementById(
@@ -74,9 +79,9 @@ function getViewerConfiguration() {
       toggleButton: document.getElementById("secondaryToolbarToggle"),
       presentationModeButton: document.getElementById("presentationMode"),
       openFileButton:
-        typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
-          ? document.getElementById("secondaryOpenFile")
-          : null,
+      typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
+        ? document.getElementById("secondaryOpenFile")
+        : null,
       printButton: document.getElementById("secondaryPrint"),
       downloadButton: document.getElementById("secondaryDownload"),
       viewBookmarkButton: document.getElementById("viewBookmark"),
@@ -175,10 +180,12 @@ function getViewerConfiguration() {
     },
     printContainer: document.getElementById("printContainer"),
     openFileInput:
-      typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
-        ? document.getElementById("fileInput")
-        : null,
-    debuggerScriptPath: "./debugger.mjs",
+    typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")
+      ? document.getElementById("fileInput")
+      : null,
+    debuggerScriptPath: "./debugger.js",
+    locale: getParameterFromQueryString('lng'),
+    pdfFileName: getParameterFromQueryString('name'),
   };
 }
 
@@ -209,6 +216,16 @@ function webViewerLoad() {
     }
   }
   PDFViewerApplication.run(config);
+}
+
+function getParameterFromQueryString(parameterName) {
+  var results = new RegExp('[\?&]' + parameterName + '=([^&#]*)').exec(window.location.href);
+    if (results == null) {
+       return null;
+    }
+    else {
+       return decodeURI(results[1]) || 0;
+    }
 }
 
 // Block the "load" event until all pages are loaded, to ensure that printing

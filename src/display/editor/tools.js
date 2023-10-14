@@ -543,8 +543,6 @@ class AnnotationEditorUIManager {
 
   #filterFactory = null;
 
-  #focusMainContainerTimeoutId = null;
-
   #idManager = new IdManager();
 
   #isEnabled = false;
@@ -605,8 +603,10 @@ class AnnotationEditorUIManager {
     const arrowChecker = self => {
       // If the focused element is an input, we don't want to handle the arrow.
       // For example, sliders can be controlled with the arrow keys.
+      const { activeElement } = document;
       return (
-        self.#container.contains(document.activeElement) &&
+        activeElement &&
+        self.#container.contains(activeElement) &&
         self.hasSomethingToControl()
       );
     };
@@ -647,28 +647,6 @@ class AnnotationEditorUIManager {
             "mac+Delete",
           ],
           proto.delete,
-        ],
-        [
-          ["Enter", "mac+Enter"],
-          proto.addNewEditorFromKeyboard,
-          {
-            // Those shortcuts can be used in the toolbar for some other actions
-            // like zooming, hence we need to check if the container has the
-            // focus.
-            checker: self =>
-              self.#container.contains(document.activeElement) &&
-              !self.isEnterHandled,
-          },
-        ],
-        [
-          [" ", "mac+ "],
-          proto.addNewEditorFromKeyboard,
-          {
-            // Those shortcuts can be used in the toolbar for some other actions
-            // like zooming, hence we need to check if the container has the
-            // focus.
-            checker: self => self.#container.contains(document.activeElement),
-          },
         ],
         [["Escape", "mac+Escape"], proto.unselectAll],
         [
@@ -757,14 +735,6 @@ class AnnotationEditorUIManager {
     this.#selectedEditors.clear();
     this.#commandManager.destroy();
     this.#altTextManager.destroy();
-    if (this.#focusMainContainerTimeoutId) {
-      clearTimeout(this.#focusMainContainerTimeoutId);
-      this.#focusMainContainerTimeoutId = null;
-    }
-    if (this.#translationTimeoutId) {
-      clearTimeout(this.#translationTimeoutId);
-      this.#translationTimeoutId = null;
-    }
   }
 
   get hcmFilter() {
@@ -1041,7 +1011,7 @@ class AnnotationEditorUIManager {
    * @param {KeyboardEvent} event
    */
   keydown(event) {
-    if (!this.isEditorHandlingKeyboard) {
+    if (!this.getActive()?.shouldGetKeyboardEvents()) {
       AnnotationEditorUIManager._keyboardManager.exec(this, event);
     }
   }
@@ -1167,10 +1137,8 @@ class AnnotationEditorUIManager {
    * Change the editor mode (None, FreeText, Ink, ...)
    * @param {number} mode
    * @param {string|null} editId
-   * @param {boolean} [isFromKeyboard] - true if the mode change is due to a
-   *   keyboard action.
    */
-  updateMode(mode, editId = null, isFromKeyboard = false) {
+  updateMode(mode, editId = null) {
     if (this.#mode === mode) {
       return;
     }
@@ -1186,11 +1154,6 @@ class AnnotationEditorUIManager {
     for (const layer of this.#allLayers.values()) {
       layer.updateMode(mode);
     }
-    if (!editId && isFromKeyboard) {
-      this.addNewEditorFromKeyboard();
-      return;
-    }
-
     if (!editId) {
       return;
     }
@@ -1201,10 +1164,6 @@ class AnnotationEditorUIManager {
         break;
       }
     }
-  }
-
-  addNewEditorFromKeyboard() {
-    this.currentLayer.addNewEditor();
   }
 
   /**
@@ -1232,7 +1191,7 @@ class AnnotationEditorUIManager {
       return;
     }
     if (type === AnnotationEditorParamsType.CREATE) {
-      this.currentLayer.addNewEditor();
+      this.currentLayer.addNewEditor(type);
       return;
     }
 
@@ -1322,17 +1281,6 @@ class AnnotationEditorUIManager {
    * @param {AnnotationEditor} editor
    */
   removeEditor(editor) {
-    if (editor.div.contains(document.activeElement)) {
-      if (this.#focusMainContainerTimeoutId) {
-        clearTimeout(this.#focusMainContainerTimeoutId);
-      }
-      this.#focusMainContainerTimeoutId = setTimeout(() => {
-        // When the div is removed from DOM the focus can move on the
-        // document.body, so we need to move it back to the main container.
-        this.focusMainContainer();
-        this.#focusMainContainerTimeoutId = null;
-      }, 0);
-    }
     this.#allEditors.delete(editor.id);
     this.unselect(editor);
     if (
@@ -1447,10 +1395,6 @@ class AnnotationEditorUIManager {
     return this.#selectedEditors.has(editor);
   }
 
-  get firstSelectedEditor() {
-    return this.#selectedEditors.values().next().value;
-  }
-
   /**
    * Unselect an editor.
    * @param {AnnotationEditor} editor
@@ -1465,13 +1409,6 @@ class AnnotationEditorUIManager {
 
   get hasSelection() {
     return this.#selectedEditors.size !== 0;
-  }
-
-  get isEnterHandled() {
-    return (
-      this.#selectedEditors.size === 1 &&
-      this.firstSelectedEditor.isEnterHandled
-    );
   }
 
   /**
@@ -1772,14 +1709,6 @@ class AnnotationEditorUIManager {
     } else {
       editor.parent.addOrRebuild(editor);
     }
-  }
-
-  get isEditorHandlingKeyboard() {
-    return (
-      this.getActive()?.shouldGetKeyboardEvents() ||
-      (this.#selectedEditors.size === 1 &&
-        this.firstSelectedEditor.shouldGetKeyboardEvents())
-    );
   }
 
   /**
